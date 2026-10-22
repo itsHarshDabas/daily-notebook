@@ -35,7 +35,7 @@ npm install
 
 1. Create a project, then run every file in `supabase/migrations/` in name order in the SQL editor (or `supabase db push` with the Supabase CLI). They create the tables, RLS policies, the `avatars` Storage bucket, and `delete_my_account()` (used by Settings > Delete account).
 2. **Set up custom SMTP** (Authentication > Emails > SMTP). Supabase needs it before you can edit email templates, and the built-in sender only allows a few emails an hour. A Gmail app password works for testing (`smtp.gmail.com`, port 465).
-3. **Make login emails send a code instead of a link:** Authentication > Emails > Templates > *Magic Link*, and put `{{ .Token }}` in the body, e.g. `Your Daily Notebook code is {{ .Token }}`. Keep the email OTP length at 6 (Authentication > Providers > Email).
+3. **Make login emails send a code instead of a link:** under Authentication > Emails > Templates, put `{{ .Token }}` in the body of both *Confirm signup* (first sign-in) and *Magic Link* (returning users), e.g. `Your Daily Notebook code is {{ .Token }}`. The app accepts 6 to 10 digit codes; 6 is the friendliest (Authentication > Providers > Email > Email OTP Length).
 
 ### 2. App
 

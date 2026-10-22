@@ -5,9 +5,17 @@ import { Text } from '@/components/ui';
 import { Fonts, Radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
-/** Six boxes backed by one hidden input, so paste and SMS/email autofill still work. */
-export function OtpInput({ value, onChange, onComplete, length = 6 }: { value: string; onChange: (v: string) => void; onComplete?: (v: string) => void; length?: number }) {
+export const OTP_MIN = 6;
+export const OTP_MAX = 10;
+
+/**
+ * Digit boxes backed by one hidden input, so paste and SMS/email autofill still work.
+ * Supabase's code length is a project setting (6 to 10), so we show at least six boxes and grow
+ * as digits arrive. A pasted or autofilled code submits itself; a typed one waits for the button.
+ */
+export function OtpInput({ value, onChange, onComplete }: { value: string; onChange: (v: string) => void; onComplete?: (v: string) => void }) {
   const theme = useTheme();
+  const length = Math.max(OTP_MIN, value.length);
   const input = useRef<TextInputInstance>(null);
   const [focused, setFocused] = useState(true);
   return (
@@ -32,9 +40,10 @@ export function OtpInput({ value, onChange, onComplete, length = 6 }: { value: s
         ref={input}
         value={value}
         onChangeText={(t) => {
-          const v = t.replace(/\D/g, '').slice(0, length);
+          const v = t.replace(/\D/g, '').slice(0, OTP_MAX);
+          const pasted = v.length - value.length > 1;
           onChange(v);
-          if (v.length === length) onComplete?.(v);
+          if (pasted && v.length >= OTP_MIN) onComplete?.(v);
         }}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
@@ -43,7 +52,7 @@ export function OtpInput({ value, onChange, onComplete, length = 6 }: { value: s
         inputMode="numeric"
         autoComplete="one-time-code"
         textContentType="oneTimeCode"
-        maxLength={length}
+        maxLength={OTP_MAX}
         caretHidden
         style={styles.hidden}
       />

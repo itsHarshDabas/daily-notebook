@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 
 import { BrandMark } from '@/components/brand';
-import { OtpInput } from '@/components/otp-input';
+import { OTP_MAX, OTP_MIN, OtpInput } from '@/components/otp-input';
 import { Banner, Button, Field, Screen, Text } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
@@ -46,7 +46,7 @@ export default function LoginScreen() {
   }
 
   async function verify(token = code) {
-    if (token.length !== 6) return setError('Enter the 6-digit code from the email.');
+    if (token.length < OTP_MIN || token.length > OTP_MAX) return setError('Enter the code from the email.');
     setBusy(true);
     setError(null);
     const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
@@ -65,7 +65,7 @@ export default function LoginScreen() {
             <Text color="textSecondary">
               {step === 'email'
                 ? 'Your day in a minute: mood, food, water, sleep, movement and money, all in one grid.'
-                : `We sent a 6-digit code to ${email}.`}
+                : `We sent a code to ${email}.`}
             </Text>
           </View>
 
@@ -94,7 +94,7 @@ export default function LoginScreen() {
             <View style={styles.form}>
               <OtpInput value={code} onChange={setCode} onComplete={verify} />
               <Banner text={error} />
-              <Button title="Verify and sign in" onPress={() => verify()} busy={busy} disabled={code.length !== 6} />
+              <Button title="Verify and sign in" onPress={() => verify()} busy={busy} disabled={code.length < OTP_MIN} />
               <View style={styles.row}>
                 <Button
                   variant="ghost"
