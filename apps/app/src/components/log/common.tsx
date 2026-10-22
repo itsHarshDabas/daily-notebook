@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { Chip } from '@/components/form';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Card, Chip, ChipGroup, Text } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
+import type { IconName } from '@/constants/trackers';
 
-export function Section({ title, children }: { title: string; children: ReactNode }) {
+export function Section({ title, children, right }: { title: string; children: ReactNode; right?: ReactNode }) {
   return (
-    <View style={styles.section}>
-      <ThemedText type="smallBold">{title}</ThemedText>
+    <Card style={styles.section}>
+      <View style={styles.sectionHead}>
+        <Text variant="heading" style={{ flex: 1 }}>
+          {title}
+        </Text>
+        {right}
+      </View>
       {children}
-    </View>
+    </Card>
   );
 }
 
@@ -19,53 +23,31 @@ export function ChipRow<T extends string | number>({
   options,
   value,
   onChange,
+  color,
 }: {
-  options: { value: T; label: string }[];
+  options: { value: T; label: string; icon?: IconName }[];
   value: T | null;
   onChange: (v: T | null) => void;
+  color?: string;
 }) {
   return (
-    <View style={styles.chips}>
+    <ChipGroup>
       {options.map((o) => (
         // Tapping the selected chip again clears it.
-        <Chip key={String(o.value)} label={o.label} selected={value === o.value} onPress={() => onChange(value === o.value ? null : o.value)} />
+        <Chip
+          key={String(o.value)}
+          label={o.label}
+          icon={o.icon}
+          color={color}
+          selected={value === o.value}
+          onPress={() => onChange(value === o.value ? null : o.value)}
+        />
       ))}
-    </View>
+    </ChipGroup>
   );
 }
 
-export function Row({ title, detail, onDelete }: { title: string; detail?: string; onDelete?: () => void }) {
-  return (
-    <ThemedView type="backgroundElement" style={styles.row}>
-      <View style={{ flex: 1 }}>
-        <ThemedText>{title}</ThemedText>
-        {detail ? (
-          <ThemedText type="small" themeColor="textSecondary">
-            {detail}
-          </ThemedText>
-        ) : null}
-      </View>
-      {onDelete ? (
-        <Pressable onPress={onDelete} accessibilityRole="button" accessibilityLabel={`Delete ${title}`} hitSlop={8}>
-          <ThemedText type="small" themeColor="textSecondary">
-            Delete
-          </ThemedText>
-        </Pressable>
-      ) : null}
-    </ThemedView>
-  );
-}
-
-export function ProgressBar({ value, max, color = '#40c463' }: { value: number; max: number; color?: string }) {
-  const pct = max > 0 ? Math.min(1, value / max) : 0;
-  return (
-    <ThemedView type="backgroundElement" style={styles.bar}>
-      <View style={[styles.fill, { width: `${pct * 100}%`, backgroundColor: color }]} />
-    </ThemedView>
-  );
-}
-
-/** Loads data once and exposes a reload; errors surface as a message instead of crashing the screen. */
+/** Loads data for a screen and exposes a reload; errors surface as a message instead of crashing. */
 export function useLoad<T>(load: () => Promise<T>, deps: unknown[]) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -86,10 +68,8 @@ export function useLoad<T>(load: () => Promise<T>, deps: unknown[]) {
 }
 
 export const styles = StyleSheet.create({
-  section: { gap: Spacing.two },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
-  row: { flexDirection: 'row', alignItems: 'center', padding: Spacing.three, borderRadius: Spacing.three, gap: Spacing.three },
-  bar: { height: 12, borderRadius: 6, overflow: 'hidden' },
-  fill: { height: '100%', borderRadius: 6 },
-  inline: { flexDirection: 'row', gap: Spacing.two, alignItems: 'center' },
+  section: { gap: Spacing.three },
+  sectionHead: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  inline: { flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-end' },
+  big: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
 });

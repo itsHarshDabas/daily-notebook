@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, ErrorText, Field } from '@/components/form';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { BrandMark } from '@/components/brand';
+import { OtpInput } from '@/components/otp-input';
+import { Banner, Button, Field, Screen, Text } from '@/components/ui';
+import { Spacing } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 
 const RESEND_SECONDS = 60;
@@ -13,7 +12,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function friendly(message: string): string {
   if (/fetch|network/i.test(message)) return "Couldn't reach the server. Check your connection and try again.";
-  if (/expired/i.test(message)) return 'That code has expired. Send a new one.';
+  if (/expired|invalid/i.test(message)) return 'That code is wrong or has expired. Try again or send a new one.';
+  if (/rate|security purposes/i.test(message)) return 'Too many attempts. Wait a minute, then try again.';
   return message;
 }
 
@@ -40,86 +40,91 @@ export default function LoginScreen() {
     setBusy(false);
     if (error) return setError(friendly(error.message));
     setEmail(clean);
+    setCode('');
     setStep('code');
     setCooldown(RESEND_SECONDS);
   }
 
-  async function verify() {
-    if (!/^\d{6,10}$/.test(code)) return setError('Enter the code from the email.');
+  async function verify(token = code) {
+    if (token.length !== 6) return setError('Enter the 6-digit code from the email.');
     setBusy(true);
     setError(null);
-    const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
+    const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
     setBusy(false);
     // On success the auth listener updates the session and the router moves on.
     if (error) setError(friendly(error.message));
   }
 
   return (
-    <ThemedView style={styles.fill}>
-      <SafeAreaView style={styles.fill}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.center}>
-          <View style={styles.card}>
-            <ThemedText type="subtitle">Daily Notebook</ThemedText>
-            {step === 'email' ? (
-              <>
-                <ThemedText themeColor="textSecondary">Sign in with a one-time code sent to your email.</ThemedText>
-                <Field
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="you@example.com"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  keyboardType="email-address"
-                  inputMode="email"
-                  onSubmitEditing={sendCode}
-                />
-                <ErrorText>{error}</ErrorText>
-                <Button title="Send code" onPress={sendCode} busy={busy} />
-              </>
-            ) : (
-              <>
-                <ThemedText themeColor="textSecondary">Enter the code we sent to {email}.</ThemedText>
-                <Field
-                  value={code}
-                  onChangeText={(t) => setCode(t.replace(/\D/g, ''))}
-                  placeholder="123456"
-                  keyboardType="number-pad"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  textContentType="oneTimeCode"
-                  maxLength={10}
-                  onSubmitEditing={verify}
-                  style={styles.code}
-                />
-                <ErrorText>{error}</ErrorText>
-                <Button title="Verify" onPress={verify} busy={busy} />
+    <Screen edges={['top', 'bottom']}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.wrap}>
+        <View style={styles.card}>
+          <BrandMark />
+          <View style={{ gap: Spacing.two }}>
+            <Text variant="display">{step === 'email' ? 'Daily Notebook' : 'Check your email'}</Text>
+            <Text color="textSecondary">
+              {step === 'email'
+                ? 'Your day in a minute: mood, food, water, sleep, movement and money, all in one grid.'
+                : `We sent a 6-digit code to ${email}.`}
+            </Text>
+          </View>
+
+          {step === 'email' ? (
+            <View style={styles.form}>
+              <Field
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="you@example.com"
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
+                inputMode="email"
+                returnKeyType="send"
+                onSubmitEditing={sendCode}
+                autoFocus
+              />
+              <Banner text={error} />
+              <Button title="Continue with email" icon="mail-outline" onPress={sendCode} busy={busy} />
+              <Text variant="caption" color="textTertiary" style={styles.center}>
+                No password needed. New here? Your account is created on first sign-in.
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.form}>
+              <OtpInput value={code} onChange={setCode} onComplete={verify} />
+              <Banner text={error} />
+              <Button title="Verify and sign in" onPress={() => verify()} busy={busy} disabled={code.length !== 6} />
+              <View style={styles.row}>
                 <Button
-                  variant="plain"
-                  title={cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend code'}
+                  variant="ghost"
+                  compact
+                  title={cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
                   onPress={sendCode}
-                  disabled={cooldown > 0}
+                  disabled={cooldown > 0 || busy}
                 />
                 <Button
-                  variant="plain"
-                  title="Use a different email"
+                  variant="ghost"
+                  compact
+                  title="Change email"
                   onPress={() => {
                     setStep('email');
-                    setCode('');
                     setError(null);
                   }}
                 />
-              </>
-            )}
-          </View>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </ThemedView>
+              </View>
+            </View>
+          )}
+        </View>
+      </KeyboardAvoidingView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  fill: { flex: 1 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: Spacing.four },
-  card: { width: '100%', maxWidth: Math.min(420, MaxContentWidth), gap: Spacing.three },
-  code: { fontSize: 24, letterSpacing: 8, textAlign: 'center' },
+  wrap: { flex: 1, minHeight: 560, justifyContent: 'center' },
+  card: { width: '100%', maxWidth: 420, alignSelf: 'center', gap: Spacing.four },
+  form: { gap: Spacing.three },
+  row: { flexDirection: 'row', justifyContent: 'space-between' },
+  center: { textAlign: 'center' },
 });

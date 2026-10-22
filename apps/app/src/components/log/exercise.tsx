@@ -1,17 +1,27 @@
 import { useState } from 'react';
-import { View } from 'react-native';
 
 import type { IsoDate } from '@daily-notebook/shared';
 
-import { Button, ErrorText, Field } from '@/components/form';
-import { ThemedText } from '@/components/themed-text';
+import { Banner, Button, Empty, Field, ListRow, Text } from '@/components/ui';
+import { TrackerColors } from '@/constants/theme';
+import type { IconName } from '@/constants/trackers';
 import { addExercise, deleteExercise, listExercises } from '@/lib/data';
 
-import { ChipRow, Row, Section, useLoad } from './common';
+import { ChipRow, Section, useLoad } from './common';
 
-const TYPES = ['Walk', 'Run', 'Gym', 'Yoga', 'Cycling', 'Sports', 'Other'].map((t) => ({ value: t, label: t }));
+const TYPES: { value: string; label: string; icon: IconName }[] = [
+  { value: 'Walk', label: 'Walk', icon: 'walk-outline' },
+  { value: 'Run', label: 'Run', icon: 'speedometer-outline' },
+  { value: 'Gym', label: 'Gym', icon: 'barbell-outline' },
+  { value: 'Yoga', label: 'Yoga', icon: 'body-outline' },
+  { value: 'Cycling', label: 'Cycling', icon: 'bicycle-outline' },
+  { value: 'Sports', label: 'Sports', icon: 'football-outline' },
+  { value: 'Other', label: 'Other', icon: 'fitness-outline' },
+];
+const ICON = Object.fromEntries(TYPES.map((t) => [t.value, t.icon])) as Record<string, IconName>;
 
 export function ExerciseLog({ date }: { date: IsoDate }) {
+  const color = TrackerColors.exercise;
   const { data, error, reload, setError } = useLoad(() => listExercises(date), [date]);
   const [type, setType] = useState<string | null>('Walk');
   const [minutes, setMinutes] = useState('');
@@ -20,8 +30,9 @@ export function ExerciseLog({ date }: { date: IsoDate }) {
 
   async function add() {
     const m = Number(minutes);
-    if (!type || !Number.isInteger(m) || m <= 0) return setError('Pick an activity and enter whole minutes.');
+    if (!type || !Number.isInteger(m) || m <= 0) return setError('Pick an activity and enter the minutes.');
     setBusy(true);
+    setError(null);
     try {
       await addExercise(date, { type, minutes: m });
       setMinutes('');
@@ -35,19 +46,24 @@ export function ExerciseLog({ date }: { date: IsoDate }) {
 
   return (
     <>
-      <Section title={`Today: ${total} minutes`}>
+      <Section title="Activity" right={<Text variant="heading" tint={color}>{total} min</Text>}>
         {(data ?? []).map((e) => (
-          <Row key={e.id} title={e.type} detail={`${e.minutes} min`} onDelete={() => deleteExercise(e.id).then(reload, (x: Error) => setError(x.message))} />
+          <ListRow
+            key={e.id}
+            icon={ICON[e.type] ?? 'fitness-outline'}
+            color={color}
+            title={e.type}
+            right={`${e.minutes} min`}
+            onDelete={() => deleteExercise(date, e.id).then(reload, (x: Error) => setError(x.message))}
+          />
         ))}
-        {data?.length === 0 ? <ThemedText themeColor="textSecondary">Nothing logged yet.</ThemedText> : null}
+        {data?.length === 0 ? <Empty icon="barbell-outline" text="No activity logged yet." /> : null}
       </Section>
       <Section title="Add activity">
-        <ChipRow options={TYPES} value={type} onChange={setType} />
-        <View>
-          <Field value={minutes} onChangeText={(t) => setMinutes(t.replace(/\D/g, ''))} placeholder="Minutes" keyboardType="number-pad" />
-        </View>
-        <ErrorText>{error}</ErrorText>
-        <Button title="Add" onPress={add} busy={busy} />
+        <ChipRow options={TYPES} value={type} onChange={setType} color={color} />
+        <Field label="Minutes" value={minutes} onChangeText={(t) => setMinutes(t.replace(/\D/g, ''))} placeholder="30" keyboardType="number-pad" maxLength={4} />
+        <Banner text={error} />
+        <Button title="Add activity" icon="add" onPress={add} busy={busy} />
       </Section>
     </>
   );

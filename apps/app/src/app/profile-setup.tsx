@@ -1,64 +1,38 @@
-import { Image } from 'expo-image';
-import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
-import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { Gender } from '@daily-notebook/shared';
 
-import { Button, Chip, ErrorText, Field } from '@/components/form';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Avatar } from '@/components/avatar';
+import { Banner, Button, Chip, ChipGroup, Field, Screen, Text } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { GENDERS } from '@/constants/trackers';
 import { uploadAvatar } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { supabase } from '@/lib/supabase';
-
-const GENDERS: { value: Gender; label: string }[] = [
-  { value: 'female', label: 'Female' },
-  { value: 'male', label: 'Male' },
-  { value: 'other', label: 'Other' },
-  { value: 'prefer_not_to_say', label: 'Prefer not to say' },
-];
+import { pickAvatar } from '@/lib/photo';
 
 export default function ProfileSetupScreen() {
-  const { session, refreshProfile } = useAuth();
-  const theme = useTheme();
+  const { updateProfile, signOut } = useAuth();
   const [name, setName] = useState('');
   const [gender, setGender] = useState<Gender | null>(null);
   const [photo, setPhoto] = useState<{ uri: string; mimeType: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function pickPhoto() {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-    if (result.canceled) return;
-    // Resize to 512 px before upload so photos stay small in MongoDB.
-    const image = await ImageManipulator.manipulate(result.assets[0].uri).resize({ width: 512 }).renderAsync();
-    const saved = await image.saveAsync({ format: SaveFormat.JPEG, compress: 0.8 });
-    setPhoto({ uri: saved.uri, mimeType: 'image/jpeg' });
-  }
-
   async function save() {
-    if (!session) return;
     if (!name.trim()) return setError('Add your name.');
     setBusy(true);
     setError(null);
     try {
-      const avatarFileId = photo ? await uploadAvatar(photo.uri, photo.mimeType) : null;
-      const { error } = await supabase
-        .from('profiles')
-        .update({ name: name.trim(), gender, ...(avatarFileId ? { avatar_file_id: avatarFileId } : {}) })
-        .eq('id', session.user.id);
-      if (error) throw error;
-      await refreshProfile();
+      let avatarFileId: string | undefined;
+      if (photo) {
+        // The photo is optional; don't block sign-up if the photo server is unreachable.
+        avatarFileId = await uploadAvatar(photo.uri, photo.mimeType).catch(() => {
+          setError('Saved without your photo; you can add it later in Settings.');
+          return undefined;
+        });
+      }
+      await updateProfile({ name: name.trim(), gender, ...(avatarFileId ? { avatarFileId } : {}) });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save your profile.');
     } finally {
@@ -67,49 +41,54 @@ export default function ProfileSetupScreen() {
   }
 
   return (
-    <ThemedView style={styles.fill}>
-      <SafeAreaView style={styles.fill}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <ThemedText type="subtitle">Set up your profile</ThemedText>
+    <Screen edges={['top', 'bottom']}>
+      <View style={styles.wrap}>
+        <View style={{ gap: Spacing.two }}>
+          <Text variant="micro" color="accent">
+            Step 1 of 1
+          </Text>
+          <Text variant="display">Set up your profile</Text>
+          <Text color="textSecondary">This is only visible to you.</Text>
+        </View>
 
-          <Pressable onPress={pickPhoto} style={styles.avatarWrap} accessibilityRole="button" accessibilityLabel="Choose profile photo">
-            {photo ? (
-              <Image source={{ uri: photo.uri }} style={styles.avatar} />
-            ) : (
-              <View style={[styles.avatar, { backgroundColor: theme.backgroundElement }]} />
-            )}
-            <ThemedText type="small" themeColor="textSecondary">
-              {photo ? 'Change photo' : 'Add a photo (optional)'}
-            </ThemedText>
-          </Pressable>
+        <Pressable
+          onPress={() => pickAvatar().then((p) => p && setPhoto(p), (e: Error) => setError(e.message))}
+          style={styles.avatar}
+          accessibilityRole="button"
+          accessibilityLabel="Choose profile photo">
+          <Avatar size={96} uri={photo?.uri} name={name || '+'} />
+          <Text variant="caption" color="accent">
+            {photo ? 'Change photo' : 'Add photo (optional)'}
+          </Text>
+        </Pressable>
 
-          <ThemedText type="smallBold">Name</ThemedText>
-          <Field value={name} onChangeText={setName} placeholder="Your name" autoComplete="name" />
+        <Field label="Name" value={name} onChangeText={setName} placeholder="Your name" autoComplete="name" maxLength={60} />
 
-          <ThemedText type="smallBold">Gender (optional)</ThemedText>
-          <View style={styles.chips}>
+        <View style={{ gap: Spacing.two }}>
+          <Text variant="caption" color="textSecondary">
+            Gender (optional)
+          </Text>
+          <ChipGroup>
             {GENDERS.map((g) => (
-              <Chip key={g.value} label={g.label} selected={gender === g.value} onPress={() => setGender(g.value)} />
+              <Chip key={g.value} label={g.label} selected={gender === g.value} onPress={() => setGender(gender === g.value ? null : g.value)} />
             ))}
-          </View>
-          {gender === 'female' && (
-            <ThemedText type="small" themeColor="textSecondary">
-              Period tracking will appear as an extra tracker. You can hide it in settings.
-            </ThemedText>
-          )}
+          </ChipGroup>
+          {gender === 'female' ? (
+            <Text variant="caption" color="textTertiary">
+              Period tracking will be added to your trackers. You can hide it any time in Settings.
+            </Text>
+          ) : null}
+        </View>
 
-          <ErrorText>{error}</ErrorText>
-          <Button title="Continue" onPress={save} busy={busy} />
-        </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+        <Banner text={error} tone={error?.startsWith('Saved') ? 'warning' : 'danger'} />
+        <Button title="Start tracking" icon="arrow-forward" onPress={save} busy={busy} />
+        <Button title="Sign out" variant="ghost" compact onPress={signOut} />
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  fill: { flex: 1 },
-  content: { padding: Spacing.four, gap: Spacing.three, maxWidth: 480, width: '100%', alignSelf: 'center' },
-  avatarWrap: { alignItems: 'center', gap: Spacing.two, alignSelf: 'center' },
-  avatar: { width: 96, height: 96, borderRadius: 48 },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
+  wrap: { width: '100%', maxWidth: 460, alignSelf: 'center', gap: Spacing.four, paddingTop: Spacing.four },
+  avatar: { alignItems: 'center', gap: Spacing.two, alignSelf: 'center' },
 });

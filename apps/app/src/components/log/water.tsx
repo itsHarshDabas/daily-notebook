@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import type { IsoDate } from '@daily-notebook/shared';
 
-import { Button, ErrorText } from '@/components/form';
-import { ThemedText } from '@/components/themed-text';
+import { Banner, Button, ProgressRing, Text } from '@/components/ui';
+import { Spacing, TrackerColors } from '@/constants/theme';
 import { getDay, getTargets, saveDay } from '@/lib/data';
-import { View } from 'react-native';
 
-import { ProgressBar, Section, styles, useLoad } from './common';
+import { Section, useLoad } from './common';
 
-const GLASS_ML = 250;
+const SIZES = [150, 250, 500];
 
 export function WaterLog({ date }: { date: IsoDate }) {
+  const color = TrackerColors.water;
   const { data, error, setError } = useLoad(async () => ({ day: await getDay(date), targets: await getTargets() }), [date]);
   const [ml, setMl] = useState(0);
 
@@ -33,22 +34,31 @@ export function WaterLog({ date }: { date: IsoDate }) {
   const target = data?.targets.waterMl ?? 2000;
   return (
     <>
-      <Section title="Water">
-        <ThemedText type="subtitle">
-          {ml} / {target} ml
-        </ThemedText>
-        <ThemedText themeColor="textSecondary">{Math.round(ml / GLASS_ML)} glasses</ThemedText>
-        <ProgressBar value={ml} max={target} color="#4aa3ff" />
+      <Section title="Today's water">
+        <View style={styles.center}>
+          <ProgressRing progress={ml / target} size={180} stroke={14} color={color}>
+            <Text variant="display">{(ml / 1000).toFixed(2)}</Text>
+            <Text variant="caption" color="textSecondary">
+              of {(target / 1000).toFixed(1)} L
+            </Text>
+          </ProgressRing>
+          <Text color="textSecondary">{ml >= target ? 'Target reached. Well done!' : `${target - ml} ml to go`}</Text>
+        </View>
+        <View style={styles.row}>
+          {SIZES.map((s) => (
+            <View key={s} style={{ flex: 1 }}>
+              <Button title={`+${s} ml`} variant={s === 250 ? 'primary' : 'secondary'} compact onPress={() => change(s)} disabled={!data} />
+            </View>
+          ))}
+        </View>
+        <Button title="Undo 250 ml" variant="ghost" compact icon="remove-circle-outline" onPress={() => change(-250)} disabled={!data || ml === 0} />
       </Section>
-      <View style={styles.inline}>
-        <View style={{ flex: 1 }}>
-          <Button title="− Glass" variant="plain" onPress={() => change(-GLASS_ML)} disabled={!data || ml === 0} />
-        </View>
-        <View style={{ flex: 2 }}>
-          <Button title="+ Glass (250 ml)" onPress={() => change(GLASS_ML)} disabled={!data} />
-        </View>
-      </View>
-      <ErrorText>{error}</ErrorText>
+      <Banner text={error} />
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  center: { alignItems: 'center', gap: Spacing.three, paddingVertical: Spacing.two },
+  row: { flexDirection: 'row', gap: Spacing.two },
+});

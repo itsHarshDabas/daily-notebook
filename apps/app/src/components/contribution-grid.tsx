@@ -1,94 +1,116 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native';
 import Svg, { Rect, Text as SvgText } from 'react-native-svg';
 
-import { buildGrid, type IsoDate, type Level } from '@daily-notebook/shared';
+import { buildGrid, type IsoDate, type Shade } from '@daily-notebook/shared';
 
+import { Text } from '@/components/ui';
+import { Fonts, levelColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
-const CELL = 12;
 const GAP = 3;
-const TOP = 16;
-const LEFT = 26;
-const FONT = 'system-ui, -apple-system, Roboto, sans-serif';
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-/** Light-to-dark green ramp like GitHub's; index = level. Level 0 uses the theme's empty colour. */
-const RAMP = ['', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
-const RAMP_DARK = ['', '#0e4429', '#006d32', '#26a641', '#39d353'];
+const TOP = 18;
+const LEFT = 28;
 
 export interface ContributionGridProps {
   end: Date;
-  levelFor: (date: IsoDate) => Level;
-  /** Optional per-day colour override, e.g. calories over target. */
-  colorFor?: (date: IsoDate) => string | undefined;
+  shade: (date: IsoDate) => Shade;
+  color: string;
+  overColor?: string;
+  selected?: IsoDate | null;
   onPressDay?: (date: IsoDate) => void;
   weeks?: number;
 }
 
-export function ContributionGrid({ end, levelFor, colorFor, onPressDay, weeks = 53 }: ContributionGridProps) {
+export function ContributionGrid({ end, shade, color, overColor, selected, onPressDay, weeks = 53 }: ContributionGridProps) {
   const theme = useTheme();
   const scroll = useRef<ScrollViewInstance>(null);
-  const dark = theme.background === '#000000';
+  const [width, setWidth] = useState(0);
   const cells = useMemo(() => buildGrid(end, weeks), [end, weeks]);
-  const width = LEFT + weeks * (CELL + GAP);
-  const height = TOP + 7 * (CELL + GAP);
+  // Fill the available width on large screens; keep cells tappable on phones and scroll instead.
+  const cell = width ? Math.max(11, Math.min(16, (width - LEFT) / weeks - GAP)) : 12;
+  const step = cell + GAP;
+  const w = LEFT + weeks * step;
+  const h = TOP + 7 * step;
+  const today = cells.at(-1)?.date;
 
-  const monthLabels = useMemo(() => {
-    const labels: { week: number; text: string }[] = [];
+  const months = useMemo(() => {
+    const out: { week: number; text: string }[] = [];
     let last = -1;
     for (const c of cells) {
       if (c.weekday !== 0) continue;
-      const m = Number(c.date.slice(5, 7)) - 1;
-      if (m !== last) {
-        labels.push({ week: c.week, text: MONTHS[m] });
-        last = m;
+      const d = new Date(c.date + 'T00:00:00');
+      if (d.getMonth() !== last) {
+        out.push({ week: c.week, text: d.toLocaleDateString(undefined, { month: 'short' }) });
+        last = d.getMonth();
       }
     }
-    return labels;
+    return out.filter((m, i) => i === 0 || m.week - out[i - 1].week >= 3);
   }, [cells]);
 
   return (
-    // Start scrolled to the newest week, like GitHub.
-    <ScrollView
-      ref={scroll}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })}>
-      <View style={styles.wrap}>
-        <Svg width={width} height={height} accessibilityLabel="Contribution grid">
-          {monthLabels.map((m) => (
-            <SvgText key={`${m.week}`} x={LEFT + m.week * (CELL + GAP)} y={10} fontSize={10} fontFamily={FONT} fill={theme.textSecondary}>
+    <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+      <ScrollView
+        ref={scroll}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })}>
+        <Svg width={w} height={h} accessibilityLabel="Contribution grid">
+          {months.map((m) => (
+            <SvgText key={m.week} x={LEFT + m.week * step} y={11} fontSize={10} fontFamily={Fonts.medium} fill={theme.textTertiary}>
               {m.text}
             </SvgText>
           ))}
           {['Mon', 'Wed', 'Fri'].map((d, i) => (
-            <SvgText key={d} x={0} y={TOP + (1 + i * 2) * (CELL + GAP) + CELL - 2} fontSize={9} fontFamily={FONT} fill={theme.textSecondary}>
+            <SvgText key={d} x={0} y={TOP + (1 + i * 2) * step + cell - 2} fontSize={9} fontFamily={Fonts.medium} fill={theme.textTertiary}>
               {d}
             </SvgText>
           ))}
           {cells.map((c) => {
-            const level = levelFor(c.date);
-            const fill = colorFor?.(c.date) ?? (level === 0 ? theme.backgroundElement : (dark ? RAMP_DARK : RAMP)[level]);
+            const s = shade(c.date);
+            const fill = s.over && overColor ? overColor : levelColor(color, s.level, theme.gridEmpty);
+            const isSel = selected === c.date;
             return (
               <Rect
                 key={c.date}
-                x={LEFT + c.week * (CELL + GAP)}
-                y={TOP + c.weekday * (CELL + GAP)}
-                width={CELL}
-                height={CELL}
-                rx={2}
+                x={LEFT + c.week * step}
+                y={TOP + c.weekday * step}
+                width={cell}
+                height={cell}
+                rx={cell * 0.22}
                 fill={fill}
+                stroke={isSel ? theme.text : c.date === today ? theme.textTertiary : 'none'}
+                strokeWidth={isSel ? 1.5 : 1}
                 onPress={onPressDay ? () => onPressDay(c.date) : undefined}
               />
             );
           })}
         </Svg>
+      </ScrollView>
+      <View style={styles.legend}>
+        <Text variant="caption" color="textTertiary">
+          Less
+        </Text>
+        {[0, 1, 2, 3, 4].map((l) => (
+          <View key={l} style={[styles.legendCell, { backgroundColor: levelColor(color, l, theme.gridEmpty) }]} />
+        ))}
+        <Text variant="caption" color="textTertiary">
+          More
+        </Text>
+        {overColor ? (
+          <>
+            <View style={[styles.legendCell, { backgroundColor: overColor, marginLeft: 10 }]} />
+            <Text variant="caption" color="textTertiary">
+              Over target
+            </Text>
+          </>
+        ) : null}
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { paddingVertical: 4 },
+  legend: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 4, marginTop: 8 },
+  legendCell: { width: 11, height: 11, borderRadius: 3 },
 });

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 
 import { sleepHours, type IsoDate } from '@daily-notebook/shared';
 
-import { Button, ErrorText, Field } from '@/components/form';
-import { ThemedText } from '@/components/themed-text';
+import { Banner, Button, Field, Text } from '@/components/ui';
+import { TrackerColors } from '@/constants/theme';
 import { getDay, saveDay } from '@/lib/data';
-import { View } from 'react-native';
 
 import { ChipRow, Section, styles, useLoad } from './common';
 
@@ -17,7 +17,14 @@ const QUALITY = [
   { value: 5, label: 'Great' },
 ];
 
+function formatClock(t: string): string {
+  // Accept "2330" or "23.30" as well as "23:30".
+  const d = t.replace(/[^\d]/g, '').slice(0, 4);
+  return d.length > 2 ? `${d.slice(0, d.length - 2)}:${d.slice(-2)}` : d;
+}
+
 export function SleepLog({ date, onDone }: { date: IsoDate; onDone: () => void }) {
+  const color = TrackerColors.sleep;
   const { data, loaded, error, setError } = useLoad(() => getDay(date), [date]);
   const [bed, setBed] = useState('');
   const [wake, setWake] = useState('');
@@ -33,7 +40,7 @@ export function SleepLog({ date, onDone }: { date: IsoDate; onDone: () => void }
   const hours = sleepHours(bed, wake);
 
   async function save() {
-    if (hours == null) return setError('Enter bedtime and wake time as HH:MM, for example 23:30 and 07:00.');
+    if (hours == null) return setError('Enter bedtime and wake time as 24-hour times, like 23:30 and 07:00.');
     setBusy(true);
     try {
       await saveDay(date, { sleep_bed: bed, sleep_wake: wake, sleep_hours: hours, sleep_quality: quality });
@@ -49,22 +56,25 @@ export function SleepLog({ date, onDone }: { date: IsoDate; onDone: () => void }
     <>
       <Section title="Last night">
         <View style={styles.inline}>
-          <View style={{ flex: 1, gap: 4 }}>
-            <ThemedText type="small" themeColor="textSecondary">Bedtime</ThemedText>
-            <Field value={bed} onChangeText={setBed} placeholder="23:30" keyboardType="numbers-and-punctuation" maxLength={5} />
+          <View style={{ flex: 1 }}>
+            <Field label="Went to bed" value={bed} onChangeText={(t) => setBed(formatClock(t))} placeholder="23:30" keyboardType="number-pad" maxLength={5} />
           </View>
-          <View style={{ flex: 1, gap: 4 }}>
-            <ThemedText type="small" themeColor="textSecondary">Woke up</ThemedText>
-            <Field value={wake} onChangeText={setWake} placeholder="07:00" keyboardType="numbers-and-punctuation" maxLength={5} />
+          <View style={{ flex: 1 }}>
+            <Field label="Woke up" value={wake} onChangeText={(t) => setWake(formatClock(t))} placeholder="07:00" keyboardType="number-pad" maxLength={5} />
           </View>
         </View>
-        {hours != null ? <ThemedText>{hours} hours</ThemedText> : null}
+        <View style={styles.big}>
+          <Text variant="display" tint={hours != null ? color : undefined} color="textTertiary">
+            {hours ?? '–'}
+          </Text>
+          <Text color="textSecondary">hours asleep</Text>
+        </View>
       </Section>
       <Section title="Sleep quality">
-        <ChipRow options={QUALITY} value={quality} onChange={setQuality} />
+        <ChipRow options={QUALITY} value={quality} onChange={setQuality} color={color} />
       </Section>
-      <ErrorText>{error}</ErrorText>
-      <Button title="Save" onPress={save} busy={busy} disabled={!loaded} />
+      <Banner text={error} />
+      <Button title="Save" icon="checkmark" onPress={save} busy={busy} disabled={!loaded} />
     </>
   );
 }

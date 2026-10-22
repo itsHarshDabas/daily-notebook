@@ -6,7 +6,7 @@ import type { VerifyToken } from './auth.ts';
 import type { Collections } from './db.ts';
 import { activityRoutes } from './routes/activity.ts';
 import { avatarRoutes } from './routes/avatar.ts';
-import { foodRoutes, type FetchFood } from './routes/foods.ts';
+import { foodRoutes, type FetchFood, type SearchFoods } from './routes/foods.ts';
 import { meRoutes } from './routes/me.ts';
 import { noteRoutes } from './routes/notes.ts';
 
@@ -20,6 +20,7 @@ export interface AppDeps {
   c: Collections;
   verifyToken: VerifyToken;
   fetchFood: FetchFood;
+  searchFoods: SearchFoods;
   corsOrigins?: string[];
   logger?: boolean;
 }
@@ -48,7 +49,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
     await secured.register(avatarRoutes, { c: deps.c });
     await secured.register(noteRoutes, { c: deps.c });
-    await secured.register(foodRoutes, { c: deps.c, fetchFood: deps.fetchFood });
+    await secured.register(foodRoutes, { c: deps.c, fetchFood: deps.fetchFood, searchFoods: deps.searchFoods });
     await secured.register(activityRoutes, { c: deps.c });
     await secured.register(meRoutes, { c: deps.c });
   });

@@ -1,14 +1,23 @@
 import { useState } from 'react';
+import { View } from 'react-native';
 
 import { monthKey, type IsoDate } from '@daily-notebook/shared';
 
-import { Button, ErrorText, Field } from '@/components/form';
-import { ThemedText } from '@/components/themed-text';
+import { Banner, Button, Field, ProgressBar, Text } from '@/components/ui';
+import { TrackerColors } from '@/constants/theme';
 import { addGoalProgress, createGoal, getGoal } from '@/lib/data';
 
-import { ProgressBar, Section, useLoad } from './common';
+import { Section, styles, useLoad } from './common';
+
+const round = (n: number) => Math.round(n * 100) / 100;
+
+function monthName(month: string) {
+  const [y, m] = month.split('-').map(Number);
+  return new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+}
 
 export function GoalLog({ date }: { date: IsoDate }) {
+  const color = TrackerColors.monthlyGoal;
   const month = monthKey(date);
   const { data, loaded, error, reload, setError } = useLoad(() => getGoal(month), [month]);
   const [title, setTitle] = useState('');
@@ -30,18 +39,25 @@ export function GoalLog({ date }: { date: IsoDate }) {
     }
   }
 
-  if (!loaded) return <ErrorText>{error}</ErrorText>;
+  if (!loaded) return <Banner text={error} />;
 
   if (!data) {
     return (
-      <Section title={`Set a goal for ${month}`}>
-        <ThemedText themeColor="textSecondary">One measurable goal for the month, like "Run 50 km" or "Save 5000".</ThemedText>
-        <Field value={title} onChangeText={setTitle} placeholder="Goal, e.g. Run" maxLength={80} />
-        <Field value={target} onChangeText={(t) => setTarget(t.replace(/[^\d.]/g, ''))} placeholder="Target, e.g. 50" keyboardType="decimal-pad" />
-        <Field value={unit} onChangeText={setUnit} placeholder="Unit, e.g. km" maxLength={20} />
-        <ErrorText>{error}</ErrorText>
+      <Section title={`Goal for ${monthName(month)}`}>
+        <Text color="textSecondary">Pick one measurable goal for the month, like "Run 50 km" or "Read 4 books".</Text>
+        <Field label="Goal" value={title} onChangeText={setTitle} placeholder="e.g. Run" maxLength={80} />
+        <View style={styles.inline}>
+          <View style={{ flex: 1 }}>
+            <Field label="Target" value={target} onChangeText={(t) => setTarget(t.replace(/[^\d.]/g, ''))} placeholder="50" keyboardType="decimal-pad" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Field label="Unit" value={unit} onChangeText={setUnit} placeholder="km" maxLength={20} />
+          </View>
+        </View>
+        <Banner text={error} />
         <Button
           title="Set goal"
+          icon="flag"
           busy={busy}
           onPress={() => {
             const t = Number(target);
@@ -53,33 +69,47 @@ export function GoalLog({ date }: { date: IsoDate }) {
     );
   }
 
-  const { goal, total } = data;
+  const { goal, total, byDate } = data;
+  const todays = byDate[date] ?? 0;
+  const done = total >= goal.target;
   return (
     <>
-      <Section title={goal.title}>
-        <ThemedText type="subtitle">
-          {total} / {goal.target} {goal.unit}
-        </ThemedText>
-        <ProgressBar value={total} max={goal.target} />
-        <ThemedText themeColor="textSecondary">
-          {total >= goal.target ? 'Goal reached. Nice work!' : `${Math.round((goal.target - total) * 100) / 100} ${goal.unit} to go`}
-        </ThemedText>
+      <Section title={goal.title} right={<Text variant="caption" color="textSecondary">{monthName(month)}</Text>}>
+        <View style={styles.big}>
+          <Text variant="display" tint={color}>
+            {round(total)}
+          </Text>
+          <Text color="textSecondary">
+            / {goal.target} {goal.unit}
+          </Text>
+        </View>
+        <ProgressBar value={total} max={goal.target} color={color} height={10} />
+        <Text variant="caption" color="textSecondary">
+          {done ? 'Goal reached. Nice work! 🎉' : `${round(goal.target - total)} ${goal.unit} to go`}
+          {todays > 0 ? ` · ${round(todays)} ${goal.unit} logged this day` : ''}
+        </Text>
       </Section>
-      <Section title="Log progress for this day">
-        <Field value={amount} onChangeText={(t) => setAmount(t.replace(/[^\d.]/g, ''))} placeholder={`Amount (${goal.unit})`} keyboardType="decimal-pad" />
-        <ErrorText>{error}</ErrorText>
-        <Button
-          title="Add progress"
-          busy={busy}
-          onPress={() => {
-            const a = Number(amount);
-            if (!(a > 0)) return setError('Enter an amount above 0.');
-            run(async () => {
-              await addGoalProgress(goal.id, date, a);
-              setAmount('');
-            });
-          }}
-        />
+      <Section title="Log progress">
+        <View style={styles.inline}>
+          <View style={{ flex: 1 }}>
+            <Field value={amount} onChangeText={(t) => setAmount(t.replace(/[^\d.]/g, ''))} placeholder={`Amount (${goal.unit})`} keyboardType="decimal-pad" />
+          </View>
+          <Button
+            title="Add"
+            icon="add"
+            compact
+            busy={busy}
+            onPress={() => {
+              const a = Number(amount);
+              if (!(a > 0)) return setError('Enter an amount above 0.');
+              run(async () => {
+                await addGoalProgress(goal, date, a);
+                setAmount('');
+              });
+            }}
+          />
+        </View>
+        <Banner text={error} />
       </Section>
     </>
   );

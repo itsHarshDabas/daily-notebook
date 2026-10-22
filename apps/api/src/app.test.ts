@@ -6,7 +6,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 
 import { buildApp } from './app.ts';
 import { collections, ensureIndexes } from './db.ts';
-import type { FetchFood } from './routes/foods.ts';
+import type { FetchFood, SearchFoods } from './routes/foods.ts';
 
 let mongo: MongoMemoryServer | undefined;
 let client: MongoClient;
@@ -24,6 +24,14 @@ const fetchFood: FetchFood = async (barcode) => {
     ? null
     : { barcode, name: 'Oats', brand: 'Acme', kcalPer100g: 380, kcalPerServing: 152, servingSize: '40 g', nutriments: {}, source: 'openfoodfacts' };
 };
+let searchDown = false;
+const searchFoods: SearchFoods = async (q) =>
+  searchDown
+    ? null
+    : [
+        { barcode: '12345678', name: `${q} bar`, brand: 'Acme', kcalPer100g: 400, kcalPerServing: 200, servingSize: '50 g', nutriments: {}, source: 'openfoodfacts' },
+        { barcode: '87654321', name: `${q} flakes`, brand: null, kcalPer100g: 360, kcalPerServing: null, servingSize: null, nutriments: {}, source: 'openfoodfacts' },
+      ];
 const auth = (u = 'user-a') => ({ authorization: `Bearer ${u}` });
 
 before(async () => {
@@ -37,7 +45,7 @@ before(async () => {
   await client.db('test').dropDatabase();
   const c = collections(client.db('test'));
   await ensureIndexes(c);
-  app = await buildApp({ c, verifyToken, fetchFood });
+  app = await buildApp({ c, verifyToken, fetchFood, searchFoods });
 });
 
 after(async () => {
@@ -105,6 +113,17 @@ test('barcode lookup caches in MongoDB', async () => {
   assert.equal(foodCalls, 1);
   assert.equal((await app.inject({ method: 'GET', url: '/foods/barcode/00000000', headers: auth() })).statusCode, 404);
   assert.equal((await app.inject({ method: 'GET', url: '/foods/barcode/abc', headers: auth() })).statusCode, 400);
+});
+
+test('food search caches results and falls back to the cache when offline', async () => {
+  const r = await app.inject({ method: 'GET', url: '/foods/search?q=granola', headers: auth() });
+  assert.equal(r.statusCode, 200);
+  assert.deepEqual(r.json().foods.map((f: { name: string }) => f.name), ['granola bar', 'granola flakes']);
+  searchDown = true;
+  const cached = await app.inject({ method: 'GET', url: '/foods/search?q=GRANOLA%20b', headers: auth() });
+  searchDown = false;
+  assert.deepEqual(cached.json().foods.map((f: { barcode: string }) => f.barcode), ['12345678']);
+  assert.equal((await app.inject({ method: 'GET', url: '/foods/search?q=a', headers: auth() })).statusCode, 400);
 });
 
 test('activity log and delete-my-data', async () => {
