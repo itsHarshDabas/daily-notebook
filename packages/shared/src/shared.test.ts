@@ -64,3 +64,12 @@ test('next period prediction needs two starts', () => {
     '2026-10-29', // cycles of 28 and 29 days average to 28.5, rounded to 29
   );
 });
+
+test('sleep hours cross midnight', async () => {
+  const { sleepHours, parseClock } = await import('./index.ts');
+  assert.equal(sleepHours('23:30', '07:00'), 7.5);
+  assert.equal(sleepHours('01:15', '09:00'), 7.8);
+  assert.equal(sleepHours('22:00', '22:00'), 0);
+  assert.equal(sleepHours('25:00', '07:00'), null);
+  assert.equal(parseClock('7:05'), 425);
+});

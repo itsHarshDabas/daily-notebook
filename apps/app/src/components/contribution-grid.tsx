@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useMemo, useRef } from 'react';
+import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native';
 import Svg, { Rect, Text as SvgText } from 'react-native-svg';
 
 import { buildGrid, type IsoDate, type Level } from '@daily-notebook/shared';
@@ -10,6 +10,7 @@ const CELL = 12;
 const GAP = 3;
 const TOP = 16;
 const LEFT = 26;
+const FONT = 'system-ui, -apple-system, Roboto, sans-serif';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** Light-to-dark green ramp like GitHub's; index = level. Level 0 uses the theme's empty colour. */
@@ -27,6 +28,7 @@ export interface ContributionGridProps {
 
 export function ContributionGrid({ end, levelFor, colorFor, onPressDay, weeks = 53 }: ContributionGridProps) {
   const theme = useTheme();
+  const scroll = useRef<ScrollViewInstance>(null);
   const dark = theme.background === '#000000';
   const cells = useMemo(() => buildGrid(end, weeks), [end, weeks]);
   const width = LEFT + weeks * (CELL + GAP);
@@ -47,16 +49,21 @@ export function ContributionGrid({ end, levelFor, colorFor, onPressDay, weeks = 
   }, [cells]);
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentOffset={{ x: width, y: 0 }}>
+    // Start scrolled to the newest week, like GitHub.
+    <ScrollView
+      ref={scroll}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })}>
       <View style={styles.wrap}>
         <Svg width={width} height={height} accessibilityLabel="Contribution grid">
           {monthLabels.map((m) => (
-            <SvgText key={`${m.week}`} x={LEFT + m.week * (CELL + GAP)} y={10} fontSize={10} fill={theme.textSecondary}>
+            <SvgText key={`${m.week}`} x={LEFT + m.week * (CELL + GAP)} y={10} fontSize={10} fontFamily={FONT} fill={theme.textSecondary}>
               {m.text}
             </SvgText>
           ))}
           {['Mon', 'Wed', 'Fri'].map((d, i) => (
-            <SvgText key={d} x={0} y={TOP + (1 + i * 2) * (CELL + GAP) + CELL - 2} fontSize={9} fill={theme.textSecondary}>
+            <SvgText key={d} x={0} y={TOP + (1 + i * 2) * (CELL + GAP) + CELL - 2} fontSize={9} fontFamily={FONT} fill={theme.textSecondary}>
               {d}
             </SvgText>
           ))}

@@ -64,8 +64,8 @@ Without `MONGODB_TEST_URI`, the API tests download and start an in-memory MongoD
 
 1. ~~Repo scaffold, Supabase schema with RLS, MongoDB API~~
 2. ~~Email OTP login and profile (name, gender, photo)~~
-3. Daily check-in for the 7 trackers plus period tracking
+3. ~~Daily check-in for the 7 trackers plus period tracking (with barcode scan for calories)~~
 4. Dashboard and per-tracker contribution grids
-5. Barcode scan and food lookup in the app
+5. Food search by name (barcode scan already works)
 6. Offline sync on phone
 7. 3D skyline view of the grid

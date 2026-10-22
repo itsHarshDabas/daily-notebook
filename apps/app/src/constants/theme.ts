@@ -62,4 +62,6 @@ export const Spacing = {
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
+/** On web the tab bar floats at the top of the page. */
+export const TopTabInset = Platform.select({ web: 72 }) ?? 0;
 export const MaxContentWidth = 800;

@@ -30,6 +30,7 @@ function RootStack() {
       </Stack.Protected>
       <Stack.Protected guard={signedIn && profileDone}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="log/[tracker]" options={{ presentation: 'modal' }} />
       </Stack.Protected>
     </Stack>
   );

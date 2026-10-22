@@ -8,7 +8,7 @@ import { ContributionGrid } from '@/components/contribution-grid';
 import { ErrorText } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { BottomTabInset, MaxContentWidth, Spacing, TopTabInset } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { loadDaySummaries, type DaySummary } from '@/lib/days';
 
@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
   fill: { flex: 1 },
   content: {
     padding: Spacing.four,
+    paddingTop: TopTabInset + Spacing.four,
     paddingBottom: BottomTabInset + Spacing.four,
     gap: Spacing.three,
     maxWidth: MaxContentWidth,
