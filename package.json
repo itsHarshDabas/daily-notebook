@@ -1,0 +1,15 @@
+{
+  "name": "daily-notebook",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "app": "npm run start -w @daily-notebook/app",
+    "web": "npm run web -w @daily-notebook/app",
+    "api": "npm run dev -w @daily-notebook/api",
+    "test": "npm run test -w @daily-notebook/shared -w @daily-notebook/api",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@daily-notebook/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/server.ts",
+    "start": "tsx src/server.ts",
+    "test": "node --import tsx --test src/**/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@daily-notebook/shared": "*",
+    "@fastify/cors": "^11.3.1",
+    "@fastify/multipart": "^10.1.4",
+    "fastify": "^5.12.7",
+    "jose": "^6.2.13",
+    "mongodb": "^7.7.0",
+    "tsx": "^4.23.15",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "mongodb-memory-server": "^11.3.0",
+    "typescript": "~6.0.3"
+  }
+}
