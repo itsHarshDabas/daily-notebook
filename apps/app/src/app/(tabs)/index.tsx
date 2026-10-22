@@ -8,6 +8,7 @@ import { TRACKER_LABELS, isLogged, toIsoDate, visibleTrackers, type DayValues, t
 import { Avatar } from '@/components/avatar';
 import { SyncBanner } from '@/components/sync-banner';
 import { Card, ProgressRing, Screen, SectionHeader, Text } from '@/components/ui';
+import { UpdateBanner } from '@/components/update-banner';
 import { Radius, Spacing, TrackerColors, levelColor } from '@/constants/theme';
 import { TrackerIcons } from '@/constants/trackers';
 import { useTheme } from '@/hooks/use-theme';
@@ -82,6 +83,7 @@ export default function TodayScreen() {
         <Avatar size={44} />
       </View>
 
+      <UpdateBanner />
       <SyncBanner />
 
       <Card style={styles.summary}>
