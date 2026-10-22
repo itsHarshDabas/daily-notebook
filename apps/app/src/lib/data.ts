@@ -2,7 +2,6 @@ import * as Crypto from 'expo-crypto';
 
 import { DEFAULT_TARGETS, monthKey, type IsoDate, type PeriodFlow, type Targets } from '@daily-notebook/shared';
 
-import { api } from './api';
 import { cacheGet, cacheUpdate, readThrough, setExecutor, write } from './offline';
 import { supabase } from './supabase';
 
@@ -22,7 +21,7 @@ export interface Day {
   period_symptoms: string[];
 }
 
-export interface Meal { id: string; meal: MealKind; food_name: string; calories: number; food_doc_id: string | null }
+export interface Meal { id: string; meal: MealKind; food_name: string; calories: number; food_barcode: string | null }
 export interface Exercise { id: string; type: string; minutes: number }
 export interface Expense { id: string; amount: number; category: string; note: string | null }
 export interface MonthlyGoal { id: string; month: string; title: string; unit: string; target: number }
@@ -34,23 +33,20 @@ type Op =
   | { kind: 'upsert'; table: string; row: Record<string, unknown>; onConflict: string }
   | { kind: 'update'; table: string; id: string; patch: Record<string, unknown> }
   | { kind: 'delete'; table: string; id: string }
-  | { kind: 'api'; path: string; method: string; body?: unknown };
+  | { kind: 'deleteMatch'; table: string; match: Record<string, string> };
 
-async function run(op: Op): Promise<void> {
-  if (op.kind === 'api') {
-    await api(op.path, {
-      method: op.method,
-      ...(op.body !== undefined ? { headers: { 'content-type': 'application/json' }, body: JSON.stringify(op.body) } : {}),
-    });
-    return;
-  }
+async function run(op: Op | { kind: 'api' }): Promise<void> {
+  // Outboxes saved before the Node API was retired may still hold 'api' ops; there's nowhere to send them.
+  if (op.kind === 'api') return;
   const q = supabase.from(op.table);
   const res =
     op.kind === 'upsert'
       ? await q.upsert(op.row, { onConflict: op.onConflict })
       : op.kind === 'update'
         ? await q.update(op.patch).eq('id', op.id)
-        : await q.delete().eq('id', op.id);
+        : op.kind === 'delete'
+          ? await q.delete().eq('id', op.id)
+          : await q.delete().match(op.match);
   if (res.error) throw new Error(res.error.message);
 }
 setExecutor((op) => run(op as Op));
@@ -70,16 +66,6 @@ function check<T>(res: { data: T; error: { message: string } | null }): T {
 /** Rows of a list query; supabase-js types lists as nullable even when the query succeeded. */
 function rows<T>(res: { data: T[] | null; error: { message: string } | null }): T[] {
   return check(res) ?? [];
-}
-
-function activity(action: 'create' | 'update' | 'delete', entity: string, entityId: string): Promise<unknown> {
-  // The activity log is nice to have; failures here never block logging.
-  return write('activity', {
-    kind: 'api',
-    path: '/activity',
-    method: 'POST',
-    body: { device: null, events: [{ action, entity, entityId, at: new Date().toISOString() }] },
-  } satisfies Op).catch(() => {});
 }
 
 // ---------- days ----------
@@ -104,7 +90,6 @@ export async function saveDay(date: IsoDate, patch: Partial<Omit<Day, 'date'>>):
         ...patch,
       })),
   );
-  activity('update', 'days', date);
 }
 
 function emptyDay(date: IsoDate): Day {
@@ -167,7 +152,6 @@ async function insertRow<T extends { id: string }>(table: string, date: IsoDate,
     { kind: 'upsert', table, row: { user_id: await userId(), date, ...full }, onConflict: 'id' } satisfies Op,
     () => cacheUpdate<T[]>(listKey(table, date), (list) => [...(list ?? []), full]),
   );
-  activity('create', table, full.id);
   return full;
 }
 
@@ -175,14 +159,13 @@ async function deleteRow(table: string, date: IsoDate, id: string, label: string
   await write(label, { kind: 'delete', table, id } satisfies Op, () =>
     cacheUpdate<{ id: string }[]>(listKey(table, date), (list) => (list ?? []).filter((r) => r.id !== id)),
   );
-  activity('delete', table, id);
 }
 
 // ---------- meals ----------
 
 export function listMeals(date: IsoDate): Promise<Meal[]> {
   return readThrough(listKey('meals', date), async () =>
-    rows<Meal>(await supabase.from('meals').select('id, meal, food_name, calories, food_doc_id').eq('date', date).order('updated_at')),
+    rows<Meal>(await supabase.from('meals').select('id, meal, food_name, calories, food_barcode').eq('date', date).order('updated_at')),
   );
 }
 
@@ -272,7 +255,6 @@ export async function createGoal(month: string, g: Pick<MonthlyGoal, 'title' | '
   await write('Set monthly goal', { kind: 'upsert', table: 'monthly_goals', row: { user_id: await userId(), ...goal }, onConflict: 'id' } satisfies Op, () =>
     cacheUpdate<GoalState | null>(`goal:${month}`, () => ({ goal, total: 0, byDate: {} })),
   );
-  activity('create', 'monthly_goals', goal.id);
 }
 
 export async function addGoalProgress(goal: MonthlyGoal, date: IsoDate, amount: number): Promise<void> {
@@ -285,7 +267,6 @@ export async function addGoalProgress(goal: MonthlyGoal, date: IsoDate, amount: 
         s ? { ...s, total: s.total + amount, byDate: { ...s.byDate, [date]: (s.byDate[date] ?? 0) + amount } } : s,
       ),
   );
-  activity('create', 'goal_progress', id);
 }
 
 // ---------- cycles ----------
@@ -299,53 +280,36 @@ export async function startCycle(date: IsoDate): Promise<void> {
   await write('Period started', { kind: 'upsert', table: 'cycles', row: { user_id: await userId(), ...cycle }, onConflict: 'id' } satisfies Op, () =>
     cacheUpdate<Cycle[]>('cycles', (l) => [...(l ?? []).filter((c) => c.start_date !== date), cycle].sort((a, b) => a.start_date.localeCompare(b.start_date))),
   );
-  activity('create', 'cycles', cycle.id);
 }
 
 export async function endCycle(id: string, date: IsoDate): Promise<void> {
   await write('Period ended', { kind: 'update', table: 'cycles', id, patch: { end_date: date } } satisfies Op, () =>
     cacheUpdate<Cycle[]>('cycles', (l) => (l ?? []).map((c) => (c.id === id ? { ...c, end_date: date } : c))),
   );
-  activity('update', 'cycles', id);
 }
 
-// ---------- MongoDB side, through the API ----------
+// ---------- foods (Open Food Facts) and notes ----------
 
-export interface Food {
-  id: string;
-  barcode: string;
-  name: string;
-  brand: string | null;
-  kcalPer100g: number | null;
-  kcalPerServing: number | null;
-  servingSize: string | null;
-}
-
-export function lookupBarcode(barcode: string): Promise<Food> {
-  return api<Food>(`/foods/barcode/${encodeURIComponent(barcode)}`);
-}
-
-export async function searchFoods(q: string): Promise<Food[]> {
-  const { foods } = await api<{ foods: Food[] }>(`/foods/search?q=${encodeURIComponent(q)}`);
-  return foods;
-}
+export { lookupBarcode, searchFoods, type Food } from './foods';
 
 export type NoteKind = 'mood' | 'period' | 'goal';
+type NoteRow = { date: string; kind: NoteKind; text: string };
 
 export async function getNote(date: IsoDate, kind: NoteKind): Promise<string> {
-  const { notes } = await readThrough(`notes:${date}`, () =>
-    api<{ notes: { date: string; kind: string; text: string }[] }>(`/notes?from=${date}&to=${date}`),
-  ).catch(() => ({ notes: [] as { date: string; kind: string; text: string }[] }));
+  const { notes } = await readThrough(`notes:${date}`, async () => ({
+    notes: rows<NoteRow>(await supabase.from('notes').select('date, kind, text').eq('date', date)),
+  })).catch(() => ({ notes: [] as NoteRow[] }));
   return notes.find((n) => n.kind === kind)?.text ?? '';
 }
 
 export async function saveNote(date: IsoDate, kind: NoteKind, text: string): Promise<void> {
   const clean = text.trim();
+  const uid = await userId();
   const op: Op = clean
-    ? { kind: 'api', path: `/notes/${date}/${kind}`, method: 'PUT', body: { text: clean } }
-    : { kind: 'api', path: `/notes/${date}/${kind}`, method: 'DELETE' };
+    ? { kind: 'upsert', table: 'notes', row: { user_id: uid, date, kind, text: clean }, onConflict: 'user_id,date,kind' }
+    : { kind: 'deleteMatch', table: 'notes', match: { user_id: uid, date, kind } };
   await write('Save note', op, () =>
-    cacheUpdate<{ notes: { date: string; kind: string; text: string }[] }>(`notes:${date}`, (c) => ({
+    cacheUpdate<{ notes: NoteRow[] }>(`notes:${date}`, (c) => ({
       notes: [...(c?.notes ?? []).filter((n) => n.kind !== kind), ...(clean ? [{ date, kind, text: clean }] : [])],
     })),
   );

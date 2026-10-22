@@ -17,12 +17,11 @@ A daily life tracker inspired by paper journals. Log 7 things a day in under a m
 | Part | Tech | Holds |
 | --- | --- | --- |
 | `apps/app` | Expo (React Native + TypeScript), Expo Router | One app for iOS, Android and web |
-| Supabase | Postgres + Auth | Email OTP login, profiles, targets and every tracker value, protected by Row Level Security |
-| `apps/api` | Node + TypeScript, Fastify | Gateway to MongoDB; verifies Supabase access tokens |
-| MongoDB Atlas | GridFS + collections | Profile photos, free-text notes, food nutrition data (Open Food Facts cache), activity log |
+| Supabase | Postgres + Auth + Storage | Email OTP login, profiles, targets, every tracker value and notes (Row Level Security), profile photos (private `avatars` bucket) |
+| Open Food Facts | Public API | Barcode and name lookups for calories, called straight from the app |
 | `packages/shared` | TypeScript | Tracker list, grid shading, streaks and averages, 3D skyline maths, period prediction |
 
-Structured, numeric data goes to Postgres; free-form and binary data goes to MongoDB. The two link by ID only, and the dashboard reads from Postgres alone.
+There is no custom backend: the app talks to Supabase directly, and RLS policies keep each user to their own rows and files.
 
 ## Setup
 
@@ -34,43 +33,31 @@ npm install
 
 ### 1. Supabase
 
-1. Create a project, then run every file in `supabase/migrations/` in name order in the SQL editor (or `supabase db push` with the Supabase CLI). The second file adds `delete_my_account()`, used by Settings > Delete account.
-2. **Make login emails send a code instead of a link:** Authentication > Emails > Templates > *Magic Link*, and put `{{ .Token }}` in the body, e.g. `Your Daily Notebook code is {{ .Token }}`.
-3. The built-in email sender has a low hourly limit; for anything beyond testing, set up custom SMTP (Resend, Amazon SES) under Authentication > Emails > SMTP.
+1. Create a project, then run every file in `supabase/migrations/` in name order in the SQL editor (or `supabase db push` with the Supabase CLI). They create the tables, RLS policies, the `avatars` Storage bucket, and `delete_my_account()` (used by Settings > Delete account).
+2. **Set up custom SMTP** (Authentication > Emails > SMTP). Supabase needs it before you can edit email templates, and the built-in sender only allows a few emails an hour. A Gmail app password works for testing (`smtp.gmail.com`, port 465).
+3. **Make login emails send a code instead of a link:** Authentication > Emails > Templates > *Magic Link*, and put `{{ .Token }}` in the body, e.g. `Your Daily Notebook code is {{ .Token }}`. Keep the email OTP length at 6 (Authentication > Providers > Email).
 
-### 2. MongoDB Atlas
-
-Create a cluster (the free tier is fine), a database user, and allow your API host's IP under Network Access.
-
-### 3. API
+### 2. App
 
 ```bash
-cp apps/api/.env.example apps/api/.env   # fill in MONGODB_URI and SUPABASE_URL
-npm run api                              # http://localhost:4000/health
-```
-
-### 4. App
-
-```bash
-cp apps/app/.env.example apps/app/.env   # Supabase URL + publishable key, API URL
+cp apps/app/.env.example apps/app/.env   # Supabase URL + publishable key
 npm run web     # browser
 npm run app     # then press i / a, or scan the QR code with Expo Go
 ```
 
-When testing on a phone, set `EXPO_PUBLIC_API_URL` to your computer's LAN IP, not `localhost`.
+### Android test build
+
+`.github/workflows/android-apk.yml` builds a release APK (signed with the debug key, for testing) on every push that touches the app, and publishes it as `daily-notebook.apk` on the [`android-latest` release](../../releases/tag/android-latest). No Expo account is needed.
 
 ## Tests
 
 ```bash
-npm test                                         # shared logic + API
-MONGODB_TEST_URI=mongodb://localhost:27017 npm test -w @daily-notebook/api   # use an existing MongoDB
+npm test    # shared logic
 ```
-
-Without `MONGODB_TEST_URI`, the API tests download and start an in-memory MongoDB.
 
 ## Roadmap
 
-1. ~~Repo scaffold, Supabase schema with RLS, MongoDB API~~
+1. ~~Repo scaffold, Supabase schema with RLS~~
 2. ~~Email OTP login and profile (name, gender, photo)~~
 3. ~~Daily check-in for the 7 trackers plus period tracking (with barcode scan for calories)~~
 4. ~~Redesigned UI with light and dark mode~~

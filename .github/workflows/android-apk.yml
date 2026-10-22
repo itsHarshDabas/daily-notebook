@@ -1,0 +1,56 @@
+# Builds an installable Android APK (no Expo account needed) and publishes it on the
+# "android-latest" GitHub release, so it can be downloaded straight to a phone.
+name: Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, 'claude/**']
+    paths: ['apps/app/**', 'packages/shared/**', 'package-lock.json', '.github/workflows/android-apk.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      # Public client config: the publishable key is meant to ship inside the app.
+      EXPO_PUBLIC_SUPABASE_URL: https://todcqjpyoncunfrncfeo.supabase.co
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_Yc8H2WB4Ol-x46djdwT4wA_cV_diW88
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - name: Generate the native Android project
+        working-directory: apps/app
+        run: npx expo prebuild --platform android --no-install
+      - name: Build release APK (signed with the debug key, for testing only)
+        working-directory: apps/app/android
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
+      - run: cp apps/app/android/app/build/outputs/apk/release/app-release.apk daily-notebook.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: daily-notebook-apk
+          path: daily-notebook.apk
+      - name: Publish to the android-latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git tag -f android-latest && git push -f origin android-latest
+          gh release view android-latest >/dev/null 2>&1 || gh release create android-latest --prerelease --title "Android test build" --notes "Latest test APK. Install on Android: download, open, and allow installs from your browser."
+          gh release edit android-latest --notes "Latest test APK built from ${GITHUB_REF_NAME} at ${GITHUB_SHA::7}. Install on Android: download, open, and allow installs from your browser."
+          gh release upload android-latest daily-notebook.apk --clobber

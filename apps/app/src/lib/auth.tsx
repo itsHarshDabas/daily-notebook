@@ -3,7 +3,7 @@ import { createContext, use, useCallback, useEffect, useState, type ReactNode } 
 
 import type { Gender } from '@daily-notebook/shared';
 
-import { api } from './api';
+import { removeAvatars } from './avatar';
 import { cacheUpdate, readThrough, resetOfflineData, startSync, write } from './offline';
 import { supabase } from './supabase';
 
@@ -12,7 +12,7 @@ export interface Profile {
   name: string | null;
   gender: Gender | null;
   periodTrackingHidden: boolean;
-  avatarFileId: string | null;
+  avatarPath: string | null;
   currency: string;
 }
 
@@ -33,7 +33,7 @@ type ProfileRow = {
   name: string | null;
   gender: Gender | null;
   period_tracking_hidden: boolean;
-  avatar_file_id: string | null;
+  avatar_path: string | null;
   currency: string;
 };
 
@@ -43,7 +43,7 @@ function toProfile(r: ProfileRow): Profile {
     name: r.name,
     gender: r.gender,
     periodTrackingHidden: r.period_tracking_hidden,
-    avatarFileId: r.avatar_file_id,
+    avatarPath: r.avatar_path,
     currency: r.currency,
   };
 }
@@ -53,7 +53,7 @@ function toRow(p: Partial<Omit<Profile, 'id'>>): Partial<ProfileRow> {
   if (p.name !== undefined) row.name = p.name;
   if (p.gender !== undefined) row.gender = p.gender;
   if (p.periodTrackingHidden !== undefined) row.period_tracking_hidden = p.periodTrackingHidden;
-  if (p.avatarFileId !== undefined) row.avatar_file_id = p.avatarFileId;
+  if (p.avatarPath !== undefined) row.avatar_path = p.avatarPath;
   if (p.currency !== undefined) row.currency = p.currency;
   return row;
 }
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const row = await readThrough('profile', async () => {
         const { data, error } = await supabase
           .from('profiles')
-          .select('id, name, gender, period_tracking_hidden, avatar_file_id, currency')
+          .select('id, name, gender, period_tracking_hidden, avatar_path, currency')
           .eq('id', s.user.id)
           .single<ProfileRow>();
         if (error) throw new Error(error.message);
@@ -118,7 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await resetOfflineData();
     },
     deleteAccount: async () => {
-      await api('/me', { method: 'DELETE' });
+      // Storage files don't cascade from auth.users, so remove the photos first.
+      if (session) await removeAvatars(session.user.id);
       const { error } = await supabase.rpc('delete_my_account');
       if (error) throw new Error(error.message);
       await supabase.auth.signOut().catch(() => {});

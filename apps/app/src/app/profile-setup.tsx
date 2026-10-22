@@ -7,15 +7,15 @@ import { Avatar } from '@/components/avatar';
 import { Banner, Button, Chip, ChipGroup, Field, Screen, Text } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { GENDERS } from '@/constants/trackers';
-import { uploadAvatar } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { uploadAvatar } from '@/lib/avatar';
 import { pickAvatar } from '@/lib/photo';
 
 export default function ProfileSetupScreen() {
   const { updateProfile, signOut } = useAuth();
   const [name, setName] = useState('');
   const [gender, setGender] = useState<Gender | null>(null);
-  const [photo, setPhoto] = useState<{ uri: string; mimeType: string } | null>(null);
+  const [photo, setPhoto] = useState<{ uri: string; base64: string; mimeType: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,15 +24,15 @@ export default function ProfileSetupScreen() {
     setBusy(true);
     setError(null);
     try {
-      let avatarFileId: string | undefined;
+      let avatarPath: string | undefined;
       if (photo) {
-        // The photo is optional; don't block sign-up if the photo server is unreachable.
-        avatarFileId = await uploadAvatar(photo.uri, photo.mimeType).catch(() => {
+        // The photo is optional; don't block sign-up if the upload fails.
+        avatarPath = await uploadAvatar(photo).catch(() => {
           setError('Saved without your photo; you can add it later in Settings.');
           return undefined;
         });
       }
-      await updateProfile({ name: name.trim(), gender, ...(avatarFileId ? { avatarFileId } : {}) });
+      await updateProfile({ name: name.trim(), gender, ...(avatarPath ? { avatarPath } : {}) });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save your profile.');
     } finally {

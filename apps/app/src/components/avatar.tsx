@@ -1,15 +1,26 @@
 import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui';
 import { useTheme } from '@/hooks/use-theme';
-import { avatarUrl } from '@/lib/api';
+import { avatarUrl } from '@/lib/avatar';
 import { useAuth } from '@/lib/auth';
 
 export function Avatar({ size = 40, uri, name }: { size?: number; uri?: string | null; name?: string | null }) {
   const theme = useTheme();
-  const { session, profile } = useAuth();
-  const fileId = profile?.avatarFileId;
+  const { profile } = useAuth();
+  const path = profile?.avatarPath;
+  const [signed, setSigned] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!path || uri) return setSigned(null);
+    let live = true;
+    avatarUrl(path).then((u) => live && setSigned(u), () => live && setSigned(null));
+    return () => {
+      live = false;
+    };
+  }, [path, uri]);
   const initials = (name ?? profile?.name ?? '?')
     .split(/\s+/)
     .map((p) => p[0])
@@ -19,10 +30,11 @@ export function Avatar({ size = 40, uri, name }: { size?: number; uri?: string |
   const round = { width: size, height: size, borderRadius: size / 2 };
 
   if (uri) return <Image source={{ uri }} style={round} />;
-  if (fileId && session) {
+  if (path && signed) {
     return (
       <Image
-        source={{ uri: avatarUrl(fileId), headers: { authorization: `Bearer ${session.access_token}` } }}
+        // Signed URLs change; cache by the storage path, which is new for every upload.
+        source={{ uri: signed, cacheKey: path }}
         style={[round, { backgroundColor: theme.surfaceAlt }]}
         transition={150}
       />
