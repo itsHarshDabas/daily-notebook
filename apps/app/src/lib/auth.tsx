@@ -3,6 +3,8 @@ import { createContext, use, useCallback, useEffect, useState, type ReactNode } 
 
 import type { Gender } from '@daily-notebook/shared';
 
+import { api } from './api';
+import { cacheUpdate, readThrough, resetOfflineData, startSync, write } from './offline';
 import { supabase } from './supabase';
 
 export interface Profile {
@@ -19,7 +21,9 @@ interface AuthState {
   session: Session | null;
   profile: Profile | null;
   refreshProfile: () => Promise<void>;
+  updateProfile: (patch: Partial<Omit<Profile, 'id'>>) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -44,6 +48,16 @@ function toProfile(r: ProfileRow): Profile {
   };
 }
 
+function toRow(p: Partial<Omit<Profile, 'id'>>): Partial<ProfileRow> {
+  const row: Partial<ProfileRow> = {};
+  if (p.name !== undefined) row.name = p.name;
+  if (p.gender !== undefined) row.gender = p.gender;
+  if (p.periodTrackingHidden !== undefined) row.period_tracking_hidden = p.periodTrackingHidden;
+  if (p.avatarFileId !== undefined) row.avatar_file_id = p.avatarFileId;
+  if (p.currency !== undefined) row.currency = p.currency;
+  return row;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -54,16 +68,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       return;
     }
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, name, gender, period_tracking_hidden, avatar_file_id, currency')
-      .eq('id', s.user.id)
-      .single<ProfileRow>();
-    if (error) console.warn('Could not load profile', error.message);
-    setProfile(data ? toProfile(data) : null);
+    try {
+      const row = await readThrough('profile', async () => {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, name, gender, period_tracking_hidden, avatar_file_id, currency')
+          .eq('id', s.user.id)
+          .single<ProfileRow>();
+        if (error) throw new Error(error.message);
+        return data;
+      });
+      setProfile(toProfile(row));
+    } catch (e) {
+      console.warn('Could not load profile', e instanceof Error ? e.message : e);
+      setProfile(null);
+    }
   }, []);
 
   useEffect(() => {
+    startSync();
     supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
       await loadProfile(data.session);
@@ -82,8 +105,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     session,
     profile,
     refreshProfile: () => loadProfile(session),
+    updateProfile: async (patch) => {
+      if (!session || !profile) return;
+      const next = { ...profile, ...patch };
+      setProfile(next);
+      await write('Update profile', { kind: 'update', table: 'profiles', id: session.user.id, patch: toRow(patch) });
+      // Keep the cached copy in step so an offline restart shows the change.
+      await cacheUpdate<ProfileRow>('profile', (r) => (r ? { ...r, ...toRow(patch) } : r));
+    },
     signOut: async () => {
       await supabase.auth.signOut();
+      await resetOfflineData();
+    },
+    deleteAccount: async () => {
+      await api('/me', { method: 'DELETE' });
+      const { error } = await supabase.rpc('delete_my_account');
+      if (error) throw new Error(error.message);
+      await supabase.auth.signOut().catch(() => {});
+      await resetOfflineData();
     },
   };
   return <AuthContext value={value}>{children}</AuthContext>;

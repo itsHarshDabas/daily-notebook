@@ -73,3 +73,46 @@ test('sleep hours cross midnight', async () => {
   assert.equal(sleepHours('25:00', '07:00'), null);
   assert.equal(parseClock('7:05'), 425);
 });
+
+test('history stats: streaks and averages', async () => {
+  const { computeStats, DEFAULT_TARGETS } = await import('./index.ts');
+  const today = new Date(2026, 9, 22);
+  const values = new Map([
+    ['2026-10-17', { water: 1000 }],
+    ['2026-10-18', { water: 2000 }],
+    ['2026-10-19', { water: 3000 }],
+    ['2026-10-21', { water: 1500 }],
+    ['2026-10-20', { water: 500 }],
+  ]);
+  const ctx = { targets: DEFAULT_TARGETS, visible: ['water' as const] };
+  const s = computeStats('water', values, today, ctx);
+  // Today (22nd) isn't logged yet, so the streak ending yesterday still counts.
+  assert.deepEqual(s, { daysLogged: 5, currentStreak: 5, longestStreak: 5, average: 1600 });
+  values.set('2026-10-15', { water: 100 });
+  assert.equal(computeStats('water', values, today, ctx).longestStreak, 5);
+  assert.equal(computeStats('all', values, today, ctx).average, null);
+});
+
+test('shadeFor uses each month goal target', async () => {
+  const { shadeFor, DEFAULT_TARGETS } = await import('./index.ts');
+  const ctx = { targets: DEFAULT_TARGETS, visible: ['monthlyGoal' as const], goalTargets: { '2026-10': 31 } };
+  assert.equal(shadeFor('monthlyGoal', '2026-10-05', { monthlyGoal: 2 }, ctx).level, 4);
+  assert.equal(shadeFor('monthlyGoal', '2026-11-05', { monthlyGoal: 2 }, ctx).level, 0);
+  assert.equal(shadeFor('all', '2026-10-05', { monthlyGoal: 2 }, ctx).level, 4);
+});
+
+test('skyline draws far faces before near ones and hides back walls', async () => {
+  const { skylineFaces, bounds } = await import('./index.ts');
+  const faces = skylineFaces(
+    [
+      { week: 0, weekday: 0, height: 1, key: 'a' },
+      { week: 1, weekday: 6, height: 0.5, key: 'b' },
+    ],
+    { angle: 30 },
+  );
+  // Each box shows its top plus exactly 2 walls.
+  assert.equal(faces.length, 6);
+  for (let i = 1; i < faces.length; i++) assert.ok(faces[i - 1].depth <= faces[i].depth);
+  const b = bounds(faces);
+  assert.ok(b.width > 0 && b.height > 0);
+});

@@ -1,7 +1,7 @@
 import { buildApp } from './app.ts';
 import { supabaseTokenVerifier } from './auth.ts';
 import { connect } from './db.ts';
-import { openFoodFacts } from './routes/foods.ts';
+import { openFoodFacts, openFoodFactsSearch } from './routes/foods.ts';
 
 function required(name: string): string {
   const v = process.env[name];
@@ -17,6 +17,7 @@ const app = await buildApp({
     legacySecret: process.env.SUPABASE_JWT_SECRET || undefined,
   }),
   fetchFood: openFoodFacts,
+  searchFoods: openFoodFactsSearch,
   corsOrigins: process.env.CORS_ORIGINS?.split(',').map((s) => s.trim()).filter(Boolean),
   logger: true,
 });

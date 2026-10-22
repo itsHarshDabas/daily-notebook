@@ -1,26 +1,34 @@
 import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { IsoDate } from '@daily-notebook/shared';
 
-import { Button, ErrorText, Field } from '@/components/form';
+import { Banner, Button, Field, Text } from '@/components/ui';
+import { Radius, TrackerColors } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import { getDay, getNote, saveDay, saveNote } from '@/lib/data';
 
 import { ChipRow, Section, useLoad } from './common';
 
 const MOODS = [
-  { value: 1, label: '😞 Awful' },
-  { value: 2, label: '🙁 Bad' },
-  { value: 3, label: '😐 Okay' },
-  { value: 4, label: '🙂 Good' },
-  { value: 5, label: '😄 Great' },
+  { value: 1, emoji: '😞', label: 'Awful' },
+  { value: 2, emoji: '🙁', label: 'Bad' },
+  { value: 3, emoji: '😐', label: 'Okay' },
+  { value: 4, emoji: '🙂', label: 'Good' },
+  { value: 5, emoji: '😄', label: 'Great' },
 ];
-const STRESS = [1, 2, 3, 4, 5].map((v) => ({ value: v, label: String(v) }));
+const STRESS = [
+  { value: 1, label: 'Calm' },
+  { value: 2, label: 'Low' },
+  { value: 3, label: 'Medium' },
+  { value: 4, label: 'High' },
+  { value: 5, label: 'Very high' },
+];
 
 export function MoodLog({ date, onDone }: { date: IsoDate; onDone: () => void }) {
-  const { data, error, setError } = useLoad(
-    async () => ({ day: await getDay(date), note: await getNote(date, 'mood').catch(() => '') }),
-    [date],
-  );
+  const theme = useTheme();
+  const color = TrackerColors.mood;
+  const { data, loaded, error, setError } = useLoad(async () => ({ day: await getDay(date), note: await getNote(date, 'mood') }), [date]);
   const [mood, setMood] = useState<number | null>(null);
   const [stress, setStress] = useState<number | null>(null);
   const [note, setNote] = useState('');
@@ -48,17 +56,41 @@ export function MoodLog({ date, onDone }: { date: IsoDate; onDone: () => void })
 
   return (
     <>
-      <Section title="How do you feel today?">
-        <ChipRow options={MOODS} value={mood} onChange={setMood} />
+      <Section title="How do you feel?">
+        <View style={styles.moods}>
+          {MOODS.map((m) => {
+            const on = mood === m.value;
+            return (
+              <Pressable
+                key={m.value}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
+                accessibilityLabel={m.label}
+                onPress={() => setMood(on ? null : m.value)}
+                style={[styles.mood, { borderColor: on ? color : theme.border, backgroundColor: on ? `${color}22` : theme.surface }]}>
+                <Text style={styles.emoji}>{m.emoji}</Text>
+                <Text variant="caption" color={on ? 'text' : 'textSecondary'}>
+                  {m.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </Section>
-      <Section title="Stress level (1 = calm, 5 = very stressed)">
-        <ChipRow options={STRESS} value={stress} onChange={setStress} />
+      <Section title="Stress level">
+        <ChipRow options={STRESS} value={stress} onChange={setStress} color={color} />
       </Section>
-      <Section title="Note (optional)">
-        <Field value={note} onChangeText={setNote} placeholder="What's on your mind?" multiline maxLength={5000} />
+      <Section title="Journal">
+        <Field value={note} onChangeText={setNote} placeholder="What's on your mind today?" multiline maxLength={5000} />
       </Section>
-      <ErrorText>{error}</ErrorText>
-      <Button title="Save" onPress={save} busy={busy} disabled={!data} />
+      <Banner text={error} />
+      <Button title="Save" icon="checkmark" onPress={save} busy={busy} disabled={!loaded} />
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  moods: { flexDirection: 'row', gap: 8 },
+  mood: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 12, borderRadius: Radius.md, borderWidth: 1 },
+  emoji: { fontSize: 28, lineHeight: 34 },
+});
