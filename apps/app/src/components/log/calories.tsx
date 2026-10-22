@@ -99,7 +99,7 @@ export function CaloriesLog({ date }: { date: IsoDate }) {
     setBusy(true);
     setError(null);
     try {
-      await addMeal(date, { meal, food_name: name.trim(), calories: k, food_doc_id: food?.id ?? null });
+      await addMeal(date, { meal, food_name: name.trim(), calories: k, food_barcode: food?.barcode ?? null });
       setName('');
       setKcal('');
       setFood(null);

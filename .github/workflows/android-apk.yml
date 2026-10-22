@@ -23,7 +23,6 @@ jobs:
       # Public client config: the publishable key is meant to ship inside the app.
       EXPO_PUBLIC_SUPABASE_URL: https://todcqjpyoncunfrncfeo.supabase.co
       EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_Yc8H2WB4Ol-x46djdwT4wA_cV_diW88
-      EXPO_PUBLIC_API_URL: https://daily-notebook-api-harsh3456ds-projects.vercel.app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

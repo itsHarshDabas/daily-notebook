@@ -9,8 +9,8 @@ import { Banner, Button, Card, Chip, ChipGroup, Field, Screen, SectionHeader, Se
 import { Spacing, TrackerColors } from '@/constants/theme';
 import { GENDERS } from '@/constants/trackers';
 import { useTheme } from '@/hooks/use-theme';
-import { uploadAvatar } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { uploadAvatar } from '@/lib/avatar';
 import { confirm } from '@/lib/confirm';
 import { getTargets, saveTargets } from '@/lib/data';
 import { flush, useSyncStatus } from '@/lib/offline';
@@ -72,8 +72,7 @@ export default function SettingsScreen() {
               task('photo', async () => {
                 const p = await pickAvatar();
                 if (!p) return;
-                const fileId = await uploadAvatar(p.uri, p.mimeType);
-                await updateProfile({ avatarFileId: fileId });
+                await updateProfile({ avatarPath: await uploadAvatar(p) });
               }, 'Photo updated.')
             }>
             <Avatar size={64} />
