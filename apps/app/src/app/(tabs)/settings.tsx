@@ -1,6 +1,6 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Switch, View } from 'react-native';
 
 import { DEFAULT_TARGETS, type Targets } from '@daily-notebook/shared';
 
@@ -16,6 +16,7 @@ import { getTargets, saveTargets } from '@/lib/data';
 import { flush, useSyncStatus } from '@/lib/offline';
 import { pickAvatar } from '@/lib/photo';
 import { useAppTheme, type ThemePreference } from '@/lib/theme';
+import { BUILD, checkForUpdate, openUpdate } from '@/lib/update';
 
 const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP', 'AED', 'CAD', 'AUD', 'JPY'];
 
@@ -175,6 +176,31 @@ export default function SettingsScreen() {
         </View>
         {sync.pending ? <Button title="Sync now" variant="secondary" compact icon="sync-outline" busy={sync.syncing} onPress={() => flush()} /> : null}
       </Card>
+
+      {Platform.OS === 'android' && BUILD ? (
+        <>
+          <SectionHeader title="App" />
+          <Card style={{ gap: Spacing.three }}>
+            <Text variant="caption" color="textSecondary">
+              Build {BUILD}
+            </Text>
+            <Button
+              title="Check for updates"
+              variant="secondary"
+              compact
+              icon="arrow-down-circle-outline"
+              busy={busy === 'update'}
+              onPress={() =>
+                task('update', async () => {
+                  const u = await checkForUpdate(true);
+                  if (!u) return setMessage({ tone: 'success', text: 'You have the latest version.' });
+                  await openUpdate();
+                })
+              }
+            />
+          </Card>
+        </>
+      ) : null}
 
       <SectionHeader title="Account" />
       <Card style={{ gap: Spacing.two }}>
