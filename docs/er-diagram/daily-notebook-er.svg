@@ -1,0 +1,450 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1960" height="1024" viewBox="0 0 1960 1024" font-family="Helvetica, Arial, sans-serif">
+<rect width="1960" height="1024" fill="#FFFFFF"/>
+<text x="40" y="48" font-size="22" font-weight="bold" fill="#1A1A1A">Daily Notebook - Database ER Diagram (Supabase Postgres)</text>
+<text x="40" y="74" font-size="13" fill="#666666">Generated from supabase/migrations on main, 2026-10-22</text>
+<polyline points="740,144.0 770,144.0 770,620.0 800,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="740,724.0 770,724.0 770,620.0 800,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="360,144.0 375,144.0 375,620.0 800,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="360,538.0 375,538.0 375,620.0 800,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="1180,168.0 1150,168.0 1150,620.0 1120,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="1180,384.0 1150,384.0 1150,620.0 1120,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="1180,748.0 1150,748.0 1150,620.0 1120,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="1560,168.0 1530,168.0 1530,620.0 1120,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="1560,442.0 1530,442.0 1530,620.0 1120,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="1560,644.0 1530,644.0 1530,620.0 1120,620.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="1880,418.0 1910,418.0 1910,144.0 1880,144.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round"/>
+<polyline points="420,288.0 402,288.0 402,480.0 420,480.0" fill="none" stroke="#4D4D4D" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<rect x="800" y="576" width="320" height="104" rx="5" fill="#F7F7F7" stroke="#666666" stroke-width="1.2"/>
+<path d="M800 608 V581 a5 5 0 0 1 5 -5 H1115 a5 5 0 0 1 5 5 V608 Z" fill="#E8E8E8" stroke="#666666" stroke-width="1.2"/>
+<text x="960.0" y="597" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">auth.users  (Supabase Auth)</text>
+<text x="824.0" y="624" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="854" y="624" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">id</text>
+<text x="1014" y="624" font-size="12" fill="#555555">uuid</text>
+<line x1="800" y1="632" x2="1120" y2="632" stroke="#666666" stroke-opacity="0.35"/>
+<text x="824.0" y="648" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="854" y="648" font-size="12" fill="#1A1A1A">email</text>
+<text x="1014" y="648" font-size="12" fill="#555555">text</text>
+<line x1="800" y1="656" x2="1120" y2="656" stroke="#666666" stroke-opacity="0.35"/>
+<text x="824.0" y="672" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="854" y="672" font-size="12" fill="#1A1A1A">created_at</text>
+<text x="1014" y="672" font-size="12" fill="#555555">timestamptz</text>
+<rect x="420" y="100" width="320" height="248" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M420 132 V105 a5 5 0 0 1 5 -5 H735 a5 5 0 0 1 5 5 V132 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="580.0" y="121" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">profiles</text>
+<text x="444.0" y="148" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK, FK</text>
+<text x="474" y="148" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">id</text>
+<text x="634" y="148" font-size="12" fill="#555555">uuid</text>
+<line x1="420" y1="156" x2="740" y2="156" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="172" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="172" font-size="12" fill="#1A1A1A">name</text>
+<text x="634" y="172" font-size="12" fill="#555555">text</text>
+<line x1="420" y1="180" x2="740" y2="180" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="196" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="196" font-size="12" fill="#1A1A1A">gender</text>
+<text x="634" y="196" font-size="12" fill="#555555">gender</text>
+<line x1="420" y1="204" x2="740" y2="204" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="220" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="220" font-size="12" fill="#1A1A1A">period_tracking_hidden</text>
+<text x="634" y="220" font-size="12" fill="#555555">boolean</text>
+<line x1="420" y1="228" x2="740" y2="228" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="244" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="244" font-size="12" fill="#1A1A1A">timezone</text>
+<text x="634" y="244" font-size="12" fill="#555555">text</text>
+<line x1="420" y1="252" x2="740" y2="252" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="268" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="268" font-size="12" fill="#1A1A1A">currency</text>
+<text x="634" y="268" font-size="12" fill="#555555">text</text>
+<line x1="420" y1="276" x2="740" y2="276" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="292" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="292" font-size="12" fill="#1A1A1A">avatar_path</text>
+<text x="634" y="292" font-size="12" fill="#555555">text</text>
+<line x1="420" y1="300" x2="740" y2="300" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="316" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="316" font-size="12" fill="#1A1A1A">created_at</text>
+<text x="634" y="316" font-size="12" fill="#555555">timestamptz</text>
+<line x1="420" y1="324" x2="740" y2="324" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="340" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="340" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="634" y="340" font-size="12" fill="#555555">timestamptz</text>
+<rect x="420" y="388" width="320" height="104" rx="5" fill="#FFFFFF" stroke="#82B366" stroke-width="1.2"/>
+<path d="M420 420 V393 a5 5 0 0 1 5 -5 H735 a5 5 0 0 1 5 5 V420 Z" fill="#D5E8D4" stroke="#82B366" stroke-width="1.2"/>
+<text x="580.0" y="409" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">storage.objects  (bucket: avatars)</text>
+<text x="444.0" y="436" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="474" y="436" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">id</text>
+<text x="634" y="436" font-size="12" fill="#555555">uuid</text>
+<line x1="420" y1="444" x2="740" y2="444" stroke="#82B366" stroke-opacity="0.35"/>
+<text x="444.0" y="460" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="460" font-size="12" fill="#1A1A1A">bucket_id</text>
+<text x="634" y="460" font-size="12" fill="#555555">text = 'avatars'</text>
+<line x1="420" y1="468" x2="740" y2="468" stroke="#82B366" stroke-opacity="0.35"/>
+<text x="444.0" y="484" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="484" font-size="12" fill="#1A1A1A">name</text>
+<text x="634" y="484" font-size="12" fill="#555555">text  &lt;uid&gt;/&lt;file&gt;</text>
+<rect x="420" y="680" width="320" height="200" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M420 712 V685 a5 5 0 0 1 5 -5 H735 a5 5 0 0 1 5 5 V712 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="580.0" y="701" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">targets</text>
+<text x="444.0" y="728" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK, FK</text>
+<text x="474" y="728" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">user_id</text>
+<text x="634" y="728" font-size="12" fill="#555555">uuid</text>
+<line x1="420" y1="736" x2="740" y2="736" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="752" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="752" font-size="12" fill="#1A1A1A">calories</text>
+<text x="634" y="752" font-size="12" fill="#555555">integer</text>
+<line x1="420" y1="760" x2="740" y2="760" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="776" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="776" font-size="12" fill="#1A1A1A">water_ml</text>
+<text x="634" y="776" font-size="12" fill="#555555">integer</text>
+<line x1="420" y1="784" x2="740" y2="784" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="800" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="800" font-size="12" fill="#1A1A1A">sleep_hours</text>
+<text x="634" y="800" font-size="12" fill="#555555">numeric(3,1)</text>
+<line x1="420" y1="808" x2="740" y2="808" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="824" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="824" font-size="12" fill="#1A1A1A">exercise_min_week</text>
+<text x="634" y="824" font-size="12" fill="#555555">integer</text>
+<line x1="420" y1="832" x2="740" y2="832" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="848" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="848" font-size="12" fill="#1A1A1A">budget_month</text>
+<text x="634" y="848" font-size="12" fill="#555555">numeric(12,2)</text>
+<line x1="420" y1="856" x2="740" y2="856" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="444.0" y="872" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="474" y="872" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="634" y="872" font-size="12" fill="#555555">timestamptz</text>
+<rect x="40" y="100" width="320" height="344" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M40 132 V105 a5 5 0 0 1 5 -5 H355 a5 5 0 0 1 5 5 V132 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="200.0" y="121" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">days</text>
+<text x="64.0" y="148" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK, FK</text>
+<text x="94" y="148" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">user_id</text>
+<text x="254" y="148" font-size="12" fill="#555555">uuid</text>
+<line x1="40" y1="156" x2="360" y2="156" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="172" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="94" y="172" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">date</text>
+<text x="254" y="172" font-size="12" fill="#555555">date</text>
+<line x1="40" y1="180" x2="360" y2="180" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="196" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="196" font-size="12" fill="#1A1A1A">mood_score</text>
+<text x="254" y="196" font-size="12" fill="#555555">smallint (1-5)</text>
+<line x1="40" y1="204" x2="360" y2="204" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="220" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="220" font-size="12" fill="#1A1A1A">stress</text>
+<text x="254" y="220" font-size="12" fill="#555555">smallint (1-5)</text>
+<line x1="40" y1="228" x2="360" y2="228" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="244" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="244" font-size="12" fill="#1A1A1A">calories_total</text>
+<text x="254" y="244" font-size="12" fill="#555555">integer</text>
+<line x1="40" y1="252" x2="360" y2="252" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="268" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="268" font-size="12" fill="#1A1A1A">water_ml</text>
+<text x="254" y="268" font-size="12" fill="#555555">integer</text>
+<line x1="40" y1="276" x2="360" y2="276" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="292" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="292" font-size="12" fill="#1A1A1A">sleep_bed</text>
+<text x="254" y="292" font-size="12" fill="#555555">time</text>
+<line x1="40" y1="300" x2="360" y2="300" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="316" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="316" font-size="12" fill="#1A1A1A">sleep_wake</text>
+<text x="254" y="316" font-size="12" fill="#555555">time</text>
+<line x1="40" y1="324" x2="360" y2="324" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="340" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="340" font-size="12" fill="#1A1A1A">sleep_hours</text>
+<text x="254" y="340" font-size="12" fill="#555555">numeric(3,1)</text>
+<line x1="40" y1="348" x2="360" y2="348" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="364" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="364" font-size="12" fill="#1A1A1A">sleep_quality</text>
+<text x="254" y="364" font-size="12" fill="#555555">smallint (1-5)</text>
+<line x1="40" y1="372" x2="360" y2="372" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="388" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="388" font-size="12" fill="#1A1A1A">period_flow</text>
+<text x="254" y="388" font-size="12" fill="#555555">period_flow</text>
+<line x1="40" y1="396" x2="360" y2="396" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="412" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="412" font-size="12" fill="#1A1A1A">period_symptoms</text>
+<text x="254" y="412" font-size="12" fill="#555555">text[]</text>
+<line x1="40" y1="420" x2="360" y2="420" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="436" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="436" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="254" y="436" font-size="12" fill="#555555">timestamptz</text>
+<rect x="40" y="494" width="320" height="152" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M40 526 V499 a5 5 0 0 1 5 -5 H355 a5 5 0 0 1 5 5 V526 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="200.0" y="515" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">notes</text>
+<text x="64.0" y="542" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK, FK</text>
+<text x="94" y="542" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">user_id</text>
+<text x="254" y="542" font-size="12" fill="#555555">uuid</text>
+<line x1="40" y1="550" x2="360" y2="550" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="566" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="94" y="566" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">date</text>
+<text x="254" y="566" font-size="12" fill="#555555">date</text>
+<line x1="40" y1="574" x2="360" y2="574" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="590" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="94" y="590" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">kind</text>
+<text x="254" y="590" font-size="12" fill="#555555">note_kind</text>
+<line x1="40" y1="598" x2="360" y2="598" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="614" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="614" font-size="12" fill="#1A1A1A">text</text>
+<text x="254" y="614" font-size="12" fill="#555555">text (1-2000 chars)</text>
+<line x1="40" y1="622" x2="360" y2="622" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="64.0" y="638" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="94" y="638" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="254" y="638" font-size="12" fill="#555555">timestamptz</text>
+<rect x="1180" y="100" width="320" height="176" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M1180 132 V105 a5 5 0 0 1 5 -5 H1495 a5 5 0 0 1 5 5 V132 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="1340.0" y="121" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">exercises</text>
+<text x="1204.0" y="148" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="1234" y="148" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">id</text>
+<text x="1394" y="148" font-size="12" fill="#555555">uuid</text>
+<line x1="1180" y1="156" x2="1500" y2="156" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="172" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">FK</text>
+<text x="1234" y="172" font-size="12" fill="#1A1A1A" font-style="italic">user_id</text>
+<text x="1394" y="172" font-size="12" fill="#555555">uuid</text>
+<line x1="1180" y1="180" x2="1500" y2="180" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="196" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="196" font-size="12" fill="#1A1A1A">date</text>
+<text x="1394" y="196" font-size="12" fill="#555555">date</text>
+<line x1="1180" y1="204" x2="1500" y2="204" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="220" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="220" font-size="12" fill="#1A1A1A">type</text>
+<text x="1394" y="220" font-size="12" fill="#555555">text</text>
+<line x1="1180" y1="228" x2="1500" y2="228" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="244" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="244" font-size="12" fill="#1A1A1A">minutes</text>
+<text x="1394" y="244" font-size="12" fill="#555555">integer</text>
+<line x1="1180" y1="252" x2="1500" y2="252" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="268" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="268" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="1394" y="268" font-size="12" fill="#555555">timestamptz</text>
+<rect x="1180" y="316" width="320" height="224" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M1180 348 V321 a5 5 0 0 1 5 -5 H1495 a5 5 0 0 1 5 5 V348 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="1340.0" y="337" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">meals</text>
+<text x="1204.0" y="364" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="1234" y="364" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">id</text>
+<text x="1394" y="364" font-size="12" fill="#555555">uuid</text>
+<line x1="1180" y1="372" x2="1500" y2="372" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="388" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">FK</text>
+<text x="1234" y="388" font-size="12" fill="#1A1A1A" font-style="italic">user_id</text>
+<text x="1394" y="388" font-size="12" fill="#555555">uuid</text>
+<line x1="1180" y1="396" x2="1500" y2="396" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="412" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="412" font-size="12" fill="#1A1A1A">date</text>
+<text x="1394" y="412" font-size="12" fill="#555555">date</text>
+<line x1="1180" y1="420" x2="1500" y2="420" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="436" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="436" font-size="12" fill="#1A1A1A">meal</text>
+<text x="1394" y="436" font-size="12" fill="#555555">meal_kind</text>
+<line x1="1180" y1="444" x2="1500" y2="444" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="460" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="460" font-size="12" fill="#1A1A1A">food_name</text>
+<text x="1394" y="460" font-size="12" fill="#555555">text</text>
+<line x1="1180" y1="468" x2="1500" y2="468" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="484" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="484" font-size="12" fill="#1A1A1A">calories</text>
+<text x="1394" y="484" font-size="12" fill="#555555">integer</text>
+<line x1="1180" y1="492" x2="1500" y2="492" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="508" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="508" font-size="12" fill="#1A1A1A">food_barcode</text>
+<text x="1394" y="508" font-size="12" fill="#555555">text</text>
+<line x1="1180" y1="516" x2="1500" y2="516" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="532" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="532" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="1394" y="532" font-size="12" fill="#555555">timestamptz</text>
+<rect x="1180" y="680" width="320" height="200" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M1180 712 V685 a5 5 0 0 1 5 -5 H1495 a5 5 0 0 1 5 5 V712 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="1340.0" y="701" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">expenses</text>
+<text x="1204.0" y="728" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="1234" y="728" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">id</text>
+<text x="1394" y="728" font-size="12" fill="#555555">uuid</text>
+<line x1="1180" y1="736" x2="1500" y2="736" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="752" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">FK</text>
+<text x="1234" y="752" font-size="12" fill="#1A1A1A" font-style="italic">user_id</text>
+<text x="1394" y="752" font-size="12" fill="#555555">uuid</text>
+<line x1="1180" y1="760" x2="1500" y2="760" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="776" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="776" font-size="12" fill="#1A1A1A">date</text>
+<text x="1394" y="776" font-size="12" fill="#555555">date</text>
+<line x1="1180" y1="784" x2="1500" y2="784" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="800" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="800" font-size="12" fill="#1A1A1A">amount</text>
+<text x="1394" y="800" font-size="12" fill="#555555">numeric(12,2)</text>
+<line x1="1180" y1="808" x2="1500" y2="808" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="824" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="824" font-size="12" fill="#1A1A1A">category</text>
+<text x="1394" y="824" font-size="12" fill="#555555">text</text>
+<line x1="1180" y1="832" x2="1500" y2="832" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="848" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="848" font-size="12" fill="#1A1A1A">note</text>
+<text x="1394" y="848" font-size="12" fill="#555555">text</text>
+<line x1="1180" y1="856" x2="1500" y2="856" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1204.0" y="872" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1234" y="872" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="1394" y="872" font-size="12" fill="#555555">timestamptz</text>
+<rect x="1560" y="100" width="320" height="200" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M1560 132 V105 a5 5 0 0 1 5 -5 H1875 a5 5 0 0 1 5 5 V132 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="1720.0" y="121" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">monthly_goals</text>
+<text x="1584.0" y="148" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="1614" y="148" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">id</text>
+<text x="1774" y="148" font-size="12" fill="#555555">uuid</text>
+<line x1="1560" y1="156" x2="1880" y2="156" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="172" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">FK, UQ1</text>
+<text x="1614" y="172" font-size="12" fill="#1A1A1A" font-style="italic">user_id</text>
+<text x="1774" y="172" font-size="12" fill="#555555">uuid</text>
+<line x1="1560" y1="180" x2="1880" y2="180" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="196" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">UQ1</text>
+<text x="1614" y="196" font-size="12" fill="#1A1A1A">month</text>
+<text x="1774" y="196" font-size="12" fill="#555555">char(7) 'YYYY-MM'</text>
+<line x1="1560" y1="204" x2="1880" y2="204" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="220" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1614" y="220" font-size="12" fill="#1A1A1A">title</text>
+<text x="1774" y="220" font-size="12" fill="#555555">text</text>
+<line x1="1560" y1="228" x2="1880" y2="228" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="244" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1614" y="244" font-size="12" fill="#1A1A1A">unit</text>
+<text x="1774" y="244" font-size="12" fill="#555555">text</text>
+<line x1="1560" y1="252" x2="1880" y2="252" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="268" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1614" y="268" font-size="12" fill="#1A1A1A">target</text>
+<text x="1774" y="268" font-size="12" fill="#555555">numeric(12,2)</text>
+<line x1="1560" y1="276" x2="1880" y2="276" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="292" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1614" y="292" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="1774" y="292" font-size="12" fill="#555555">timestamptz</text>
+<rect x="1560" y="350" width="320" height="176" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M1560 382 V355 a5 5 0 0 1 5 -5 H1875 a5 5 0 0 1 5 5 V382 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="1720.0" y="371" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">goal_progress</text>
+<text x="1584.0" y="398" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="1614" y="398" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">id</text>
+<text x="1774" y="398" font-size="12" fill="#555555">uuid</text>
+<line x1="1560" y1="406" x2="1880" y2="406" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="422" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">FK</text>
+<text x="1614" y="422" font-size="12" fill="#1A1A1A" font-style="italic">goal_id</text>
+<text x="1774" y="422" font-size="12" fill="#555555">uuid</text>
+<line x1="1560" y1="430" x2="1880" y2="430" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="446" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">FK</text>
+<text x="1614" y="446" font-size="12" fill="#1A1A1A" font-style="italic">user_id</text>
+<text x="1774" y="446" font-size="12" fill="#555555">uuid</text>
+<line x1="1560" y1="454" x2="1880" y2="454" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="470" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1614" y="470" font-size="12" fill="#1A1A1A">date</text>
+<text x="1774" y="470" font-size="12" fill="#555555">date</text>
+<line x1="1560" y1="478" x2="1880" y2="478" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="494" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1614" y="494" font-size="12" fill="#1A1A1A">amount</text>
+<text x="1774" y="494" font-size="12" fill="#555555">numeric(12,2)</text>
+<line x1="1560" y1="502" x2="1880" y2="502" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="518" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1614" y="518" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="1774" y="518" font-size="12" fill="#555555">timestamptz</text>
+<rect x="1560" y="576" width="320" height="152" rx="5" fill="#FFFFFF" stroke="#6C8EBF" stroke-width="1.2"/>
+<path d="M1560 608 V581 a5 5 0 0 1 5 -5 H1875 a5 5 0 0 1 5 5 V608 Z" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.2"/>
+<text x="1720.0" y="597" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">cycles</text>
+<text x="1584.0" y="624" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">PK</text>
+<text x="1614" y="624" font-size="12" fill="#1A1A1A" text-decoration="underline" font-weight="bold">id</text>
+<text x="1774" y="624" font-size="12" fill="#555555">uuid</text>
+<line x1="1560" y1="632" x2="1880" y2="632" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="648" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">FK, UQ1</text>
+<text x="1614" y="648" font-size="12" fill="#1A1A1A" font-style="italic">user_id</text>
+<text x="1774" y="648" font-size="12" fill="#555555">uuid</text>
+<line x1="1560" y1="656" x2="1880" y2="656" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="672" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555">UQ1</text>
+<text x="1614" y="672" font-size="12" fill="#1A1A1A">start_date</text>
+<text x="1774" y="672" font-size="12" fill="#555555">date</text>
+<line x1="1560" y1="680" x2="1880" y2="680" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="696" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1614" y="696" font-size="12" fill="#1A1A1A">end_date</text>
+<text x="1774" y="696" font-size="12" fill="#555555">date</text>
+<line x1="1560" y1="704" x2="1880" y2="704" stroke="#6C8EBF" stroke-opacity="0.35"/>
+<text x="1584.0" y="720" font-size="10" font-weight="bold" text-anchor="middle" fill="#555555"></text>
+<text x="1614" y="720" font-size="12" fill="#1A1A1A">updated_at</text>
+<text x="1774" y="720" font-size="12" fill="#555555">timestamptz</text>
+<line x1="748" y1="137.0" x2="748" y2="151.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="753" y1="137.0" x2="753" y2="151.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="792" y1="613.0" x2="792" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="787" y1="613.0" x2="787" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="748" y1="717.0" x2="748" y2="731.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="753" y1="717.0" x2="753" y2="731.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="792" y1="613.0" x2="792" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="787" y1="613.0" x2="787" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="360" y1="137.0" x2="370" y2="144.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="360" y1="151.0" x2="370" y2="144.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="370" y1="137.0" x2="370" y2="151.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="379" cy="144.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="792" y1="613.0" x2="792" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="787" y1="613.0" x2="787" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="360" y1="531.0" x2="370" y2="538.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="360" y1="545.0" x2="370" y2="538.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="370" y1="531.0" x2="370" y2="545.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="379" cy="538.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="792" y1="613.0" x2="792" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="787" y1="613.0" x2="787" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1180" y1="161.0" x2="1170" y2="168.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1180" y1="175.0" x2="1170" y2="168.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1170" y1="161.0" x2="1170" y2="175.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="1161" cy="168.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1128" y1="613.0" x2="1128" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1133" y1="613.0" x2="1133" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1180" y1="377.0" x2="1170" y2="384.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1180" y1="391.0" x2="1170" y2="384.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1170" y1="377.0" x2="1170" y2="391.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="1161" cy="384.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1128" y1="613.0" x2="1128" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1133" y1="613.0" x2="1133" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1180" y1="741.0" x2="1170" y2="748.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1180" y1="755.0" x2="1170" y2="748.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1170" y1="741.0" x2="1170" y2="755.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="1161" cy="748.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1128" y1="613.0" x2="1128" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1133" y1="613.0" x2="1133" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1560" y1="161.0" x2="1550" y2="168.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1560" y1="175.0" x2="1550" y2="168.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1550" y1="161.0" x2="1550" y2="175.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="1541" cy="168.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1128" y1="613.0" x2="1128" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1133" y1="613.0" x2="1133" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1560" y1="435.0" x2="1550" y2="442.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1560" y1="449.0" x2="1550" y2="442.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1550" y1="435.0" x2="1550" y2="449.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="1541" cy="442.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1128" y1="613.0" x2="1128" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1133" y1="613.0" x2="1133" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1560" y1="637.0" x2="1550" y2="644.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1560" y1="651.0" x2="1550" y2="644.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1550" y1="637.0" x2="1550" y2="651.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="1541" cy="644.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1128" y1="613.0" x2="1128" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1133" y1="613.0" x2="1133" y2="627.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1880" y1="411.0" x2="1890" y2="418.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1880" y1="425.0" x2="1890" y2="418.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1890" y1="411.0" x2="1890" y2="425.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="1899" cy="418.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1888" y1="137.0" x2="1888" y2="151.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="1893" y1="137.0" x2="1893" y2="151.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="412" y1="281.0" x2="412" y2="295.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="403" cy="288.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<line x1="412" y1="473.0" x2="412" y2="487.0" stroke="#4D4D4D" stroke-width="1.3"/>
+<circle cx="403" cy="480.0" r="4.5" fill="#FFFFFF" stroke="#4D4D4D" stroke-width="1.3"/>
+<rect x="800" y="100" width="320" height="346" rx="5" fill="#FFFFFF" stroke="#B3B3B3"/>
+<text x="812" y="124" font-size="12" fill="#1A1A1A" font-weight="bold">Legend</text>
+<text x="812" y="146" font-size="12" fill="#1A1A1A">PK  primary key  (underlined)</text>
+<text x="812" y="168" font-size="12" fill="#1A1A1A">FK  foreign key  (italic)</text>
+<text x="812" y="190" font-size="12" fill="#1A1A1A">UQ1  columns of one unique constraint</text>
+<text x="812" y="212" font-size="12" fill="#1A1A1A">|| ---- O&lt;   one user : zero or many rows</text>
+<text x="812" y="234" font-size="12" fill="#1A1A1A">|| ---- ||   one user : exactly one row</text>
+<text x="812" y="256" font-size="12" fill="#1A1A1A">- - - - -   logical link (path, not an FK)</text>
+<text x="812" y="278" font-size="12" fill="#1A1A1A"></text>
+<text x="812" y="300" font-size="12" fill="#1A1A1A">Every FK to auth.users is ON DELETE CASCADE.</text>
+<text x="812" y="322" font-size="12" fill="#1A1A1A">goal_progress.goal_id is ON DELETE CASCADE.</text>
+<text x="812" y="344" font-size="12" fill="#1A1A1A">RLS on every public table: a user can only</text>
+<text x="812" y="366" font-size="12" fill="#1A1A1A">read and write rows where user_id = auth.uid().</text>
+<text x="812" y="388" font-size="12" fill="#1A1A1A">Avatars live at avatars/&lt;uid&gt;/&lt;file&gt;; storage</text>
+<text x="812" y="410" font-size="12" fill="#1A1A1A">policies limit each user to their own folder.</text>
+<text x="812" y="432" font-size="12" fill="#1A1A1A">Signup trigger creates profiles + targets rows.</text>
+<rect x="800" y="740" width="320" height="224" rx="5" fill="#FFFFFF" stroke="#D6B656" stroke-width="1.2"/>
+<path d="M800 772 V745 a5 5 0 0 1 5 -5 H1115 a5 5 0 0 1 5 5 V772 Z" fill="#FFF2CC" stroke="#D6B656" stroke-width="1.2"/>
+<text x="960.0" y="761" font-size="13" font-weight="bold" text-anchor="middle" fill="#1A1A1A">Enum types (public)</text>
+<text x="812" y="788" font-size="12" font-weight="bold" fill="#1A1A1A">gender</text>
+<text x="812" y="812" font-size="12" fill="#555555">female | male | other | prefer_not_to_say</text>
+<text x="812" y="836" font-size="12" font-weight="bold" fill="#1A1A1A">meal_kind</text>
+<text x="812" y="860" font-size="12" fill="#555555">breakfast | lunch | dinner | snack</text>
+<text x="812" y="884" font-size="12" font-weight="bold" fill="#1A1A1A">period_flow</text>
+<text x="812" y="908" font-size="12" fill="#555555">light | medium | heavy</text>
+<text x="812" y="932" font-size="12" font-weight="bold" fill="#1A1A1A">note_kind</text>
+<text x="812" y="956" font-size="12" fill="#555555">mood | period | goal</text>
+</svg>
